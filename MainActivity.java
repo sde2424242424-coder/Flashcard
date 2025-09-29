@@ -14,6 +14,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button btn= findViewById(R.id.btnStart);
+        TextView tv = findViewById(R.id,tvHello);
+
+        btn.setOnClickListener(v -> {
+            tv.setText("Botton pushed!");
+        });
+
         // Создание базы
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "cards.db").allowMainThreadQueries().build();

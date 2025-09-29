@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -30,9 +29,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
 dependencies {
@@ -47,7 +43,6 @@ dependencies {
 
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
-    implementation(libs.core.ktx)
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 
     // WorkManager
