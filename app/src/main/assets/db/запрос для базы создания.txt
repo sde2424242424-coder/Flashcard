@@ -1,0 +1,2 @@
+Get-Content "C:\Flashcard\app\src\main\assets\db\deck1.sql" | & "C:\sqlite\sqlite3.exe" "C:\Flashcard\app\src\main\assets\db\cards_deck_1.db"
+

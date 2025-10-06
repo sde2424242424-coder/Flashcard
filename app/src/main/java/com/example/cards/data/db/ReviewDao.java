@@ -14,18 +14,21 @@ import java.util.List;
 @Dao
 public interface ReviewDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long upsertState(ReviewState s);
+    @Query("""
+        SELECT c.* 
+        FROM cards c
+        LEFT JOIN review_state s ON s.cardId = c.id
+        WHERE (s.dueAt IS NULL OR s.dueAt <= :nowMillis)
+        ORDER BY IFNULL(s.dueAt, 0) ASC
+        LIMIT :limit
+    """)
+    List<Card> dueCards(long nowMillis, int limit);
 
-    @Query("SELECT Card.* FROM Card " +
-            "JOIN ReviewState ON Card.id = ReviewState.cardId " +
-            "WHERE ReviewState.dueAt <= :now " +
-            "ORDER BY ReviewState.dueAt ASC " +
-            "LIMIT :limit")
-    List<Card> dueCards(long now, int limit);
-
-    @Query("SELECT * FROM ReviewState WHERE cardId = :cardId LIMIT 1")
+    @Query("SELECT * FROM review_state WHERE cardId = :cardId LIMIT 1")
     ReviewState getState(long cardId);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long upsertState(ReviewState state);
 
     @Insert
     long insertLog(ReviewLog log);

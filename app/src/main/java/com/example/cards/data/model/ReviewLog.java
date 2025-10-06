@@ -1,6 +1,8 @@
 package com.example.cards.data.model;
 
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -8,32 +10,32 @@ import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
 
-@Entity(
-        tableName = "ReviewLog",
-        foreignKeys = {
-                @ForeignKey(
-                        entity = Card.class,
-                        parentColumns = {"id"},
-                        childColumns = {"cardId"},
-                        onDelete = CASCADE
-                )
-        },
+/*@Entity(
+        tableName = "review_log",
+        foreignKeys = @ForeignKey(
+                entity = Card.class,
+                parentColumns = {"id"},
+                childColumns = {"cardId"},
+                onDelete = CASCADE
+        ),
         indices = {
                 @Index("cardId"),
                 @Index("reviewedAt")
         }
-)
+)*/
+@Entity(tableName = "review_log",
+        indices = {@Index("cardId")})
 public class ReviewLog {
+    @PrimaryKey(autoGenerate = true) public long id;
 
-    @PrimaryKey(autoGenerate = true)
-    public long id;
-
-    public long cardId;
-    public long reviewedAt;   // время ревью
-    public int grade;
-
-    public int resultIntervalDays;
-    public int resultStep;
-    public double resultEase;
+    @ColumnInfo public long cardId;
+    @ColumnInfo public long reviewedAt;          // millis
+    @ColumnInfo public int  grade;               // 0..5
+    @ColumnInfo public int  resultIntervalDays;
+    @ColumnInfo public double resultEase;
+    @ColumnInfo
+    public int  resultStep;
+    @NonNull
     public long ts;
 }
+

@@ -1,13 +1,14 @@
-plugins {
+plugins{
+    buildFeatures { viewBinding = true
     alias(libs.plugins.android.application)
 }
 
 android {
-    namespace = "com.example.flashcard"
+    namespace = "com.example.cards"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.flashcard"
+        applicationId = "com.example.cards"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

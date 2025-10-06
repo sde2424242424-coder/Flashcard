@@ -1,4 +1,4 @@
-package com.example.flashcard;
+package com.example.cards;
 
 import android.os.Bundle;
 import android.util.Log;
