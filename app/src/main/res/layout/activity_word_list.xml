@@ -5,6 +5,8 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -14,6 +16,21 @@
         app:title="Мои слова"
         app:titleCentered="true"
         app:titleTextColor="@android:color/white" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Поиск слова">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionSearch"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
 
     <!-- Заголовок таблицы -->
     <LinearLayout
@@ -27,8 +44,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.5"
-            android:text="Слово (кор.)"
+            android:layout_weight="1.2"
+            android:text="Слово
+"
             android:textStyle="bold"
             android:gravity="center"/>
 
@@ -51,8 +69,8 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.7"
-            android:text="Grade"
+            android:layout_weight="0.8"
+            android:text="Выучено"
             android:textStyle="bold"
             android:gravity="center"/>
 

@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="Flashcard">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-10-05T14:32:27.673929600Z">
+        <DropdownSelection timestamp="2025-10-17T06:00:00.275786200Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RF8RA0RABPY" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=29c3435234017ece" />
             </handle>
           </Target>
         </DropdownSelection>

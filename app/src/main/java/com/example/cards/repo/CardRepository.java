@@ -41,11 +41,11 @@ public class CardRepository {
         s = Sm2.review(s, grade);
 
         st.intervalDays = s.intervalDays;
-        st.ease = s.ease;
+        st.ease = (float) s.ease;
         st.step = s.step;
         st.dueAt = now + (s.intervalDays * 24L * 60L * 60L * 1000L);
 
-        db.reviewDao().upsertState(st);
+        db.reviewDao().upsertStateEntity(st);
 
         ReviewLog log = new ReviewLog();
         log.cardId = cardId;

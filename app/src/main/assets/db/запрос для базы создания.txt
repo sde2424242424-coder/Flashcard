@@ -1,2 +1,43 @@
+cd "C:\sqlite"
+
+№1
 Get-Content "C:\Flashcard\app\src\main\assets\db\deck1.sql" | & "C:\sqlite\sqlite3.exe" "C:\Flashcard\app\src\main\assets\db\cards_deck_1.db"
 
+cd "C:\sqlite\sqlite3.exe"
+.\sqlite3.exe cards_deck_1.db ".read C:\Flashcard\app\src\main\assets\db\deck1.sql"
+.\sqlite3.exe cards_deck_1.db "SELECT front, back FROM cards;"
+
+№2
+Get-Content "C:\Flashcard\app\src\main\assets\db\deck2.sql" | & "C:\sqlite\sqlite3.exe" "C:\Flashcard\app\src\main\assets\db\cards_deck_2.db"
+
+cd "C:\sqlite\sqlite3.exe"
+.\sqlite3.exe cards_deck_2.db ".read C:\Flashcard\app\src\main\assets\db\deck2.sql"
+.\sqlite3.exe cards_deck_2.db "SELECT front, back FROM cards;"
+
+№3
+Get-Content "C:\Flashcard\app\src\main\assets\db\deck3.sql" | & "C:\sqlite\sqlite3.exe" "C:\Flashcard\app\src\main\assets\db\cards_deck_3.db"
+
+cd "C:\sqlite\sqlite3.exe"
+.\sqlite3.exe cards_deck_3.db ".read C:\Flashcard\app\src\main\assets\db\deck3.sql"
+.\sqlite3.exe cards_deck_3.db "SELECT front, back FROM cards;"
+
+№4
+Get-Content "C:\Flashcard\app\src\main\assets\db\deck4.sql" | & "C:\sqlite\sqlite3.exe" "C:\Flashcard\app\src\main\assets\db\cards_deck_4.db"
+
+cd "C:\sqlite\sqlite3.exe"
+.\sqlite3.exe cards_deck_4.db ".read C:\Flashcard\app\src\main\assets\db\deck2.sql"
+.\sqlite3.exe cards_deck_4.db "SELECT front, back FROM cards;"
+
+№5
+Get-Content "C:\Flashcard\app\src\main\assets\db\deck5.sql" | & "C:\sqlite\sqlite3.exe" "C:\Flashcard\app\src\main\assets\db\cards_deck_2.db"
+
+cd "C:\sqlite\sqlite3.exe"
+.\sqlite3.exe cards_deck_5.db ".read C:\Flashcard\app\src\main\assets\db\deck5.sql"
+.\sqlite3.exe cards_deck_5.db "SELECT front, back FROM cards;"
+
+№6
+Get-Content "C:\Flashcard\app\src\main\assets\db\deck6.sql" | & "C:\sqlite\sqlite3.exe" "C:\Flashcard\app\src\main\assets\db\cards_deck_6.db"
+
+cd "C:\sqlite\sqlite3.exe"
+.\sqlite3.exe cards_deck_6.db ".read C:\Flashcard\app\src\main\assets\db\deck6.sql"
+.\sqlite3.exe cards_deck_6.db "SELECT front, back FROM cards;"

@@ -3,4 +3,16 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="brand_bg">#000000</color>
+    <color name="teal_700">#018786</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="cute_bg">#FFF5F7</color>
+    <color name="cute_pill">#FDDDE6</color>
+    <color name="cute_card_bg">#FFFAFB</color>
+    <color name="cute_stroke">#F9B8C0</color>
+    <color name="cute_text_primary">#4B3F3F</color>
+    <color name="cute_ripple">#1AF9B8C0</color>
+    <!-- res/values/colors.xml -->
+    <color name="cute_pink">#F8B6C4</color>
+
+
 </resources>
