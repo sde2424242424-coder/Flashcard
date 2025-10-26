@@ -5,6 +5,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,12 +33,16 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
 
     static class VH extends RecyclerView.ViewHolder {
         TextView title;
-        ImageView fox;
+        ImageView fox;           // may be null for normal items
+        TextView percent;        // may be null if layout doesn't have it
+        ProgressBar progress;    // may be null if layout doesn't have it
 
         VH(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tvTitle);
-            fox   = itemView.findViewById(R.id.imgFox);
+            fox   = itemView.findViewById(R.id.imgFox);      // null for normal layout
+            percent = itemView.findViewById(R.id.tvPercent);
+            progress = itemView.findViewById(R.id.progress);
         }
     }
 
@@ -61,6 +66,11 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
         Deck d = data.get(pos);
         h.title.setText(d.title);
 
+        // безопасно обновляем процент (если соответствующие view присутствуют)
+        int pct = d.getPercent();
+        if (h.percent != null) h.percent.setText(pct + "%");
+        if (h.progress != null) h.progress.setProgress(pct);
+
         h.itemView.setOnClickListener(v -> {
             if (onClick != null) onClick.onClick(d);
         });
@@ -70,41 +80,40 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
             if (h.fox == null) {
                 // Значит в item_deck_first.xml нет ImageView с id imgFox
                 android.util.Log.e("DeckAdapter", "imgFox == null: проверь @id/imgFox в item_deck_first.xml");
-                return;
+            } else {
+                // делаем её кликабельной ТУТ, а не выше
+                h.fox.setClickable(true);
+                h.fox.setFocusable(true);
+                h.fox.setFocusableInTouchMode(true);
+
+                h.fox.setOnTouchListener((v, event) -> {
+                    float x = event.getX(), y = event.getY();
+                    float w = v.getWidth(), hgt = v.getHeight();
+
+                    float left = w * 0.30f, right = w * 0.70f;
+                    float top  = hgt * 0.30f, bottom = hgt * 0.70f;
+
+                    boolean inside = (x >= left && x <= right && y >= top && y <= bottom);
+
+                    switch (event.getActionMasked()) {
+                        case MotionEvent.ACTION_DOWN:
+                            v.getParent().requestDisallowInterceptTouchEvent(inside);
+                            return !inside; // вне зоны — съедаем
+                        case MotionEvent.ACTION_MOVE:
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_CANCEL:
+                            return !inside;
+                    }
+                    return false;
+                });
+
+                h.fox.setOnClickListener(v -> {
+                    v.animate()
+                            .translationYBy(-10f).setDuration(100)
+                            .withEndAction(() -> v.animate().translationYBy(10f).setDuration(100).start())
+                            .start();
+                });
             }
-
-            // делаем её кликабельной ТУТ, а не выше
-            h.fox.setClickable(true);
-            h.fox.setFocusable(true);
-            h.fox.setFocusableInTouchMode(true);
-
-            h.fox.setOnTouchListener((v, event) -> {
-                float x = event.getX(), y = event.getY();
-                float w = v.getWidth(), hgt = v.getHeight();
-
-                float left = w * 0.30f, right = w * 0.70f;
-                float top  = hgt * 0.30f, bottom = hgt * 0.70f;
-
-                boolean inside = (x >= left && x <= right && y >= top && y <= bottom);
-
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        v.getParent().requestDisallowInterceptTouchEvent(inside);
-                        return !inside; // вне зоны — съедаем
-                    case MotionEvent.ACTION_MOVE:
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        return !inside;
-                }
-                return false;
-            });
-
-            h.fox.setOnClickListener(v -> {
-                v.animate()
-                        .translationYBy(-10f).setDuration(100)
-                        .withEndAction(() -> v.animate().translationYBy(10f).setDuration(100).start())
-                        .start();
-            });
         } else {
             // на всякий случай уберём слушатели у обычных айтемов
             if (h.fox != null) {
@@ -114,9 +123,7 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
         }
     }
 
-
-
-        @Override
+    @Override
     public int getItemCount() {
         return data.size();
     }

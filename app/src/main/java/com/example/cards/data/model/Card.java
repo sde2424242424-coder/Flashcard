@@ -40,6 +40,8 @@ public class Card {
 
 
 
+
+
     // (опционально) setters, если нужны Room-геттеры/сеттеры вместо public полей
     // public void setId(long id) { this.id = id; }
     // public void setDeckId(long deckId) { this.deckId = deckId; }

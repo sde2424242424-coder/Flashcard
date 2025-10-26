@@ -4,52 +4,84 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="100dp"
+    android:paddingTop="110dp"
     android:paddingBottom="10dp"
     android:paddingHorizontal="12dp"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:background="@color/cute_bg">
 
-    <!-- 🦊 Лисичка -->
+    <!-- Карточка-ячейка с рамкой -->
+    <LinearLayout
+        android:id="@+id/cardContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_pill_outline"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="18dp"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
 
+        <!-- Название -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:text="Название"
+            android:textColor="@color/cute_text_primary"
+            android:textSize="16sp" />
+
+        <!-- Процент + прогресс ПОД названием, внутри ячейки -->
+        <LinearLayout
+            android:id="@+id/percentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="6dp">
+
+            <TextView
+                android:id="@+id/tvPercent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0%"
+                android:textAlignment="viewEnd"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@color/cute_text_primary" />
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginTop="2dp"
+                android:indeterminate="false"
+                android:progress="0"
+                android:progressTint="@color/teal_200" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 🦊 Лисичка (привязана к краю ячейки) -->
     <ImageView
         android:id="@+id/imgFox"
-        android:padding="12dp"
         android:layout_width="160dp"
         android:layout_height="160dp"
-        android:layout_marginEnd="4dp"
+        android:padding="12dp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/desc_fox"
         android:elevation="8dp"
-        android:gravity="bottom"
         android:scaleType="centerInside"
         android:src="@drawable/fox_peek"
         android:translationX="-10dp"
-        android:translationY="-185dp"
-        app:layout_constraintEnd_toEndOf="@id/tvTitle"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        android:translationY="-134dp"
         android:clickable="true"
         android:focusable="true"
-        android:focusableInTouchMode="true"/>
-
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/bg_pill_outline"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center_vertical"
-        android:paddingVertical="14dp"
-        android:paddingStart="18dp"
-        android:paddingEnd="18dp"
-        android:textColor="@color/cute_text_primary"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
-    />
+        android:focusableInTouchMode="true"
+        app:layout_constraintTop_toTopOf="@id/cardContainer"
+        app:layout_constraintEnd_toEndOf="@id/cardContainer"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

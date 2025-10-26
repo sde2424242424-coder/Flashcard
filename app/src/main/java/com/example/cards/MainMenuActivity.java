@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,7 +22,6 @@ import com.example.cards.ui.DeckAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,25 +35,7 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-
-
-
         setContentView(R.layout.activity_main_menu); // XML с DrawerLayout
-
-        /*long deckId = getIntent().getLongExtra("deck_id", 1L);
-
-        // 🔍 Проверяем какой файл реально используется
-        File f = getDatabasePath("cards_deck_" + deckId + ".db");
-        Log.d("DB", "Using DB: " + f.getAbsolutePath() +
-                " size=" + f.length() +
-                " mtime=" + new java.util.Date(f.lastModified()));
-
-        // Теперь открываем базу как обычно
-        AppDatabase db = DbProvider.forDeck(this, deckId);
-        CardDao cardDao = db.cardDao();
-        ReviewDao reviewDao = db.reviewDao();*/
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
@@ -64,27 +44,9 @@ public class MainMenuActivity extends AppCompatActivity {
         // Открытие меню по нажатию на иконку в Toolbar
         toolbar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
-        // Обработка пунктов бокового меню
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                // Мы уже на главном — просто закрываем меню.
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            } else if (id == R.id.nav_settings) {
-                startActivity(new Intent(this, SettingsActivity.class));
-            } else if (id == R.id.nav_about) {
-                startActivity(new Intent(this, AboutActivity.class));
-            }
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        });
-
         // Список колод
         RecyclerView rv = findViewById(R.id.decksList);
         rv.setLayoutManager(new LinearLayoutManager(this));
-       // rv.addItemDecoration(new DividerItemDecoration(this, RecyclerView.VERTICAL));
-
 
         String[] deckNames = {
                 "Слова 1급",
@@ -106,22 +68,61 @@ public class MainMenuActivity extends AppCompatActivity {
             i.putExtra(DeckActivity.EXTRA_DECK_ID, deck.id);
             i.putExtra(DeckActivity.EXTRA_DECK_TITLE, deck.title);
             startActivity(i);
-
         });
         rv.setAdapter(adapter);
 
+        // Асинхронно рассчитываем процент выученных слов для каждой колоды
+        AppDatabase.databaseExecutor.execute(() -> {
+            for (int i = 0; i < decks.size(); i++) {
+                Deck deck = decks.get(i);
+                try {
+                    // Получаем per-deck DB (DbProvider.getDatabase кэширует экземпляры)
+                    AppDatabase db = DbProvider.getDatabase(this, deck.id);
+                    CardDao cardDao = db.cardDao();
+                    ReviewDao reviewDao = db.reviewDao();
 
+                    // total карт в этой БД
+                    int total = 0;
+                    try {
+                        total = cardDao.countAll();
+                    } catch (Exception e) {
+                        Log.w("MainMenu", "countAll failed for deck " + deck.id, e);
+                    }
 
-        // ===== БАЗА ДАННЫХ: пример чтения карточек из колоды №1 =====
-        /*AppDatabase db = AppDatabase.getInstance(this);
-        new Thread(() -> {
-            List<Card> cards = db.cardDao().getByDeck(1L).getValue(); // колода №1
-            runOnUiThread(() -> {
-                // здесь обнови UI/лог или передай данные дальше
-                // например можно просто залогировать размер:
-                // Toast.makeText(this, "В колоде №1: " + cards.size() + " карт", Toast.LENGTH_SHORT).show();
-            });
-        }).start();*/
-        // ============================================================
+                    // learned — сначала через DAO (SQL), это быстрее и безопаснее
+                    int learned = 0;
+                    try {
+                        learned = cardDao.countLearnedCards(deck.id);
+                    } catch (Exception e) {
+                        Log.w("MainMenu", "countLearnedCards failed for deck " + deck.id + ", fallback to scanning", e);
+                        // fallback: посчитать в памяти, если в схеме нет countLearnedCards или если запрос не подходит
+                        try {
+                            List<Card> all = cardDao.getAll(); // может быть тяжёлым для больших БД
+                            int localLearned = 0;
+                            for (Card c : all) {
+                                if (c == null) continue;
+                                // Card.learned у вас boolean (Room maps 0/1 -> false/true)
+                                try {
+                                    if (c.learned) localLearned++;
+                                } catch (Throwable ignore) {
+                                    // на случай, если поле отсутствует в runtime модели
+                                }
+                            }
+                            learned = localLearned;
+                        } catch (Exception ex) {
+                            Log.w("MainMenu", "fallback scan failed for deck " + deck.id, ex);
+                        }
+                    }
+
+                    final int pct = (total == 0) ? 0 : (int) Math.round(learned * 100.0 / total);
+                    deck.setPercent(pct);
+
+                    final int pos = i;
+                    runOnUiThread(() -> adapter.notifyItemChanged(pos));
+                } catch (Exception e) {
+                    Log.w("MainMenu", "Failed to compute percent for deck " + deck.id, e);
+                }
+            }
+        });
     }
 }

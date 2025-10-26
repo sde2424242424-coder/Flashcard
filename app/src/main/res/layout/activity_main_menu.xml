@@ -59,7 +59,9 @@
             app:layout_constraintTop_toBottomOf="@id/headerContainer"
             app:layout_constraintVertical_bias="0.0" />
 
-        <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <!-- Лисичка: привязана к правому краю и верху списка -->

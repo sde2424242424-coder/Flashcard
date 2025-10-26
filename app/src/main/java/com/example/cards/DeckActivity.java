@@ -9,13 +9,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.cards.data.db.AppDatabase;
-// ИЛИ используй ваш DbProvider, если он у тебя есть:
-// import com.example.cards.data.db.DbProvider;
 import com.example.cards.data.db.CardDao;
 import com.example.cards.data.model.Card;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 
+import java.io.File;
 import java.util.List;
 
 public class DeckActivity extends AppCompatActivity {
@@ -33,10 +32,23 @@ public class DeckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deck);
 
-        deckId = getIntent().getLongExtra(EXTRA_DECK_ID, 1L);
+        // --- Явно логируем incoming extras и не маскируем отсутствие ключа ---
+        deckId = getIntent().getLongExtra(EXTRA_DECK_ID, -1L); // <- из -1 станет очевидно, если ключ не пришёл
         String deckTitle = getIntent().getStringExtra(EXTRA_DECK_TITLE);
         String deckDesc  = getIntent().getStringExtra(EXTRA_DECK_DESC);
 
+        Log.d("DeckActivity", "onCreate: received extras deckId=" + deckId +
+                " title=" + deckTitle + " desc=" + deckDesc);
+
+        if (deckId == -1L) {
+            Log.e("DeckActivity", "Missing EXTRA_DECK_ID! Aborting.");
+            // можно показать toast или finish()
+            // Toast.makeText(this, "Ошибка: не выбрана колода", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // UI
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(deckTitle != null ? deckTitle : ("Колода " + deckId));
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
@@ -49,39 +61,44 @@ public class DeckActivity extends AppCompatActivity {
         MaterialButton btnWordList = findViewById(R.id.btnWordList);
         MaterialButton btnStudy    = findViewById(R.id.btnStudy);
 
-        // ОТКРЫВАЕМ ИМЕННО ФАЙЛ ЭТОЙ КОЛОДЫ
-        db = AppDatabase.DbFactory.forDeck(this, deckId); // или DbProvider.forDeck(...)
+        // До вызова фабрики — проверим ожидаемый путь файла
+        String dbFileName = "cards_deck_" + deckId + ".db";
+        File expected = getDatabasePath(dbFileName);
+        Log.d("DeckActivity", "expected DB file path = " + expected.getAbsolutePath() +
+                " exists=" + expected.exists() + " size=" + expected.length());
+
+        // Открываем БД (фабрика может скопировать файл из assets при первом вызове).
+        // Оборачиваем операции с Room/SQLite в background executor, чтобы не блокировать UI.
+        db = AppDatabase.DbFactory.forDeck(this, deckId);
         cardDao = db.cardDao();
 
-        Log.d("DB", "Opened path = " + db.getOpenHelper().getWritableDatabase().getPath());
+        // После создания Room — снова проверим файл (фабрика могла скопировать asset)
+        Log.d("DeckActivity", "after forDeck: expected.exists=" + expected.exists() + " size=" + expected.length());
 
-        // ВСЕ ЗАПРОСЫ — НЕ НА UI ПОТОКЕ
         AppDatabase.databaseExecutor.execute(() -> {
             try {
-                // Если у тебя отдельный .db на каждую колоду — начинаем с варианта БЕЗ фильтра
-                int total = cardDao.countAll(); // SELECT COUNT(*) FROM cards
+                // Получим путь БД в фоне (без открытия на UI потоке)
+                String dbPath = db.getOpenHelper().getReadableDatabase().getPath();
+                Log.d("DB", "Opened (background) path = " + dbPath);
+
+                int total = cardDao.countAll();
                 Log.d("DB", "[no-filter] total=" + total + " (deckId=" + deckId + ")");
 
                 if (total == 0) {
-                    Log.w("DB", "Файл колоды пуст. Либо пересоздали БД, либо не подложили данные. " +
-                            "Если используешь createFromAsset, удали существующий файл и дай Room заново скопировать из assets.");
+                    Log.w("DB", "Файл колоды пуст или таблица cards пуста.");
                 } else {
-                    // Проба чтения 5 карточек без фильтра
                     List<Card> sample = cardDao.getPage(5, 0);
                     for (Card c : sample) {
                         Log.d("DB", "[no-filter] " + c.id + " " + c.front + " / " + c.back + " deckId=" + c.deckId);
                     }
                 }
 
-                // Если ты В ДАО используешь запросы С ФИЛЬТРОМ по deckId — проверим, что они что-то возвращают
-                int byDeck = cardDao.countByDeck(deckId); // SELECT COUNT(*) FROM cards WHERE deckId=:deckId
+                int byDeck = cardDao.countByDeck(deckId);
                 Log.d("DB", "[with-filter] byDeck=" + byDeck + " (deckId=" + deckId + ")");
-
                 if (byDeck == 0 && total > 0) {
-                    Log.w("DB", "В файле есть строки, но по deckId=" + deckId + " ничего не нашлось. " +
-                            "Скорее всего, внутри файла у всех записей deckId=1. " +
-                            "Либо не фильтруй по deckId для per-deck файла, " +
-                            "либо один раз выполни UPDATE cards SET deckId=" + deckId + " при создании файла.");
+                    Log.w("DB", "В БД есть записи, но filter by deckId ничего не вернул. " +
+                            "Возможно в файле deckId других значений или DAO использует фильтр, " +
+                            "а вы ожидаете per-file БД без фильтра.");
                 }
 
             } catch (Exception e) {

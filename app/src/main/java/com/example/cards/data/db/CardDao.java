@@ -27,6 +27,12 @@ public interface CardDao {
     @Query("SELECT * FROM cards WHERE deckId = :deckId ORDER BY id LIMIT :limit OFFSET :offset")
     List<Card> getPageByDeck(long deckId, int limit, int offset);
 
+    @Query("SELECT COUNT(*) FROM cards WHERE deckId = :deckId AND learned = 1")
+    int countLearnedCards(long deckId);
+
+    @Query("SELECT COUNT(*) FROM learned_state ls JOIN cards c ON c.id = ls.cardId WHERE c.deckId = :deckId AND ls.learned = 1")
+    int countLearnedState(long deckId);
+
     // Поиск
     @Query("""
 SELECT 
