@@ -12,7 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cards.R;
+import com.example.cards.data.db.AppDatabase;
 import com.example.cards.data.model.Deck;
+import com.example.cards.data.db.DbProvider;
+
 
 import java.util.List;
 
@@ -33,16 +36,16 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
 
     static class VH extends RecyclerView.ViewHolder {
         TextView title;
-        ImageView fox;           // may be null for normal items
-        TextView percent;        // may be null if layout doesn't have it
-        ProgressBar progress;    // may be null if layout doesn't have it
+        ImageView fox;
+        TextView tvPercent;    // может быть null, если в этом layout не существует
+        ProgressBar progress;  // может быть null
 
         VH(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tvTitle);
-            fox   = itemView.findViewById(R.id.imgFox);      // null for normal layout
-            percent = itemView.findViewById(R.id.tvPercent);
-            progress = itemView.findViewById(R.id.progress);
+            fox   = itemView.findViewById(R.id.imgFox);
+            tvPercent = itemView.findViewById(R.id.tvPercent);
+            progress  = itemView.findViewById(R.id.progress);
         }
     }
 
@@ -63,65 +66,86 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {
+        // 1) Текущая модель
         Deck d = data.get(pos);
-        h.title.setText(d.title);
+        h.title.setText(d.title); // у тебя поля, не геттеры, значит оставляем d.title
 
-        // безопасно обновляем процент (если соответствующие view присутствуют)
-        int pct = d.getPercent();
-        if (h.percent != null) h.percent.setText(pct + "%");
-        if (h.progress != null) h.progress.setProgress(pct);
+        // 2) Плейсхолдеры под процент
+        if (h.tvPercent != null) h.tvPercent.setText("…%");
+        if (h.progress  != null) {
+            h.progress.setMax(100);
+            h.progress.setProgress(0);
+        }
 
+        // 3) Фоновый расчёт процента
+        AppDatabase.databaseExecutor.execute(() -> {
+            AppDatabase db = DbProvider.forDeck(h.itemView.getContext(), d.id); // ← ВАЖНО
+            int percent = db.cardDao().learnedPercent(d.id);
+
+            h.itemView.post(() -> {
+                int cur = h.getBindingAdapterPosition();
+                if (cur == RecyclerView.NO_POSITION) return;
+                // защита от рассинхронизации холдера
+                if (data.get(cur).id != d.id) return;
+
+                if (h.tvPercent != null) h.tvPercent.setText(percent + "%");
+                if (h.progress  != null) h.progress.setProgress(percent);
+            });
+        });
+
+
+        // 4) Клик по карточке колоды
         h.itemView.setOnClickListener(v -> {
             if (onClick != null) onClick.onClick(d);
         });
 
-        // --- ЛИСА ТОЛЬКО ДЛЯ ПЕРВОГО ТИПА ---
+        // 5) Лиса только для первого типа
         if (getItemViewType(pos) == TYPE_FIRST) {
             if (h.fox == null) {
-                // Значит в item_deck_first.xml нет ImageView с id imgFox
                 android.util.Log.e("DeckAdapter", "imgFox == null: проверь @id/imgFox в item_deck_first.xml");
-            } else {
-                // делаем её кликабельной ТУТ, а не выше
-                h.fox.setClickable(true);
-                h.fox.setFocusable(true);
-                h.fox.setFocusableInTouchMode(true);
+                return;
+            }
+            h.fox.setClickable(true);
+            h.fox.setFocusable(true);
+            h.fox.setFocusableInTouchMode(true);
 
-                h.fox.setOnTouchListener((v, event) -> {
-                    float x = event.getX(), y = event.getY();
-                    float w = v.getWidth(), hgt = v.getHeight();
+            h.fox.setOnTouchListener((v, event) -> {
+                float x = event.getX(), y = event.getY();
+                float w = v.getWidth(), hgt = v.getHeight();
 
-                    float left = w * 0.30f, right = w * 0.70f;
-                    float top  = hgt * 0.30f, bottom = hgt * 0.70f;
+                float left = w * 0.30f, right = w * 0.70f;
+                float top  = hgt * 0.30f, bottom = hgt * 0.70f;
 
-                    boolean inside = (x >= left && x <= right && y >= top && y <= bottom);
+                boolean inside = (x >= left && x <= right && y >= top && y <= bottom);
 
-                    switch (event.getActionMasked()) {
-                        case MotionEvent.ACTION_DOWN:
-                            v.getParent().requestDisallowInterceptTouchEvent(inside);
-                            return !inside; // вне зоны — съедаем
-                        case MotionEvent.ACTION_MOVE:
-                        case MotionEvent.ACTION_UP:
-                        case MotionEvent.ACTION_CANCEL:
-                            return !inside;
-                    }
-                    return false;
-                });
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        v.getParent().requestDisallowInterceptTouchEvent(inside);
+                        return !inside;
+                    case MotionEvent.ACTION_MOVE:
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        return !inside;
+                }
+                return false;
+            });
 
-                h.fox.setOnClickListener(v -> {
+            h.fox.setOnClickListener(v ->
                     v.animate()
                             .translationYBy(-10f).setDuration(100)
                             .withEndAction(() -> v.animate().translationYBy(10f).setDuration(100).start())
-                            .start();
-                });
-            }
+                            .start()
+            );
         } else {
-            // на всякий случай уберём слушатели у обычных айтемов
             if (h.fox != null) {
                 h.fox.setOnClickListener(null);
                 h.fox.setOnTouchListener(null);
             }
         }
     }
+
+
+
 
     @Override
     public int getItemCount() {

@@ -1,57 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:weightSum="5"
-    android:background="@drawable/list_item_border">
+    android:padding="10dp"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="6dp"
+    android:gravity="center_vertical"
+    android:elevation="2dp"
+    android:background="@drawable/card_bg_cute">
 
-    <TextView
-        android:id="@+id/tvFront"
+
+    <!-- Слово и перевод -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1.5"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:gravity="center"/>
+        android:layout_weight="2.5"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
 
-    <TextView
-        android:id="@+id/tvBack"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.5"
-        android:textSize="16sp"
-        android:gravity="center"/>
+        <!-- Слово (корейское) -->
+        <TextView
+            android:id="@+id/tvFront"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="남대문"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/fox_brown"
+            android:gravity="center_vertical"/>
 
-    <TextView
-        android:id="@+id/tvScore"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.7"
-        android:gravity="center"
-        android:text="0"/>
+        <!-- Тире -->
+        <TextView
+            android:id="@+id/tvDash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  —  "
+            android:textSize="16sp"
+            android:textColor="@color/fox_brown"
+            android:gravity="center_vertical"/>
 
-    <TextView
-        android:id="@+id/tvGrade"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.6"
-        android:gravity="center"
-        android:text="—" />
+        <!-- Перевод (английский) -->
+        <TextView
+            android:id="@+id/tvBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Namdaemun Gate"
+            android:textSize="15sp"
+            android:textColor="@color/fox_darkpink"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
 
 
+    <!-- Галочка “выучено” -->
     <CheckBox
         android:id="@+id/checkbox_learned"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="" />
+        android:buttonTint="@color/fox_pink"
+        android:focusable="false"
+        android:clickable="true"/>
 
-
-    <TextView
-        android:id="@+id/tvRev"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.6"
-        android:gravity="center"
-        android:text="0"/>
+    <!-- Rev -->
 </LinearLayout>

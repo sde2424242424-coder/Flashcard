@@ -3,6 +3,7 @@ package com.example.cards;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,13 +11,13 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.cards.data.db.AppDatabase;
-import com.example.cards.data.db.DbProvider;
 import com.example.cards.data.model.Card;
 import com.example.cards.domain.ReviewRepository;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Random;
 
 public class StudyActivity extends AppCompatActivity {
 
@@ -25,6 +26,22 @@ public class StudyActivity extends AppCompatActivity {
 
     private Button btnShowTranslation, btnEasy, btnMedium, btnHard;
     private TextView tvWord, tvTranslation;
+
+    // ---- Новые поля (лиса + облачко) ----
+    private ImageView foxImage;
+    private TextView bubbleText;
+    private int hardClicks = 0;
+    private final Random rnd = new Random();
+
+    private final String[] normalPhrases = new String[] {
+            "Отлично! Ещё чуть-чуть 🦊",
+            "Ты молодец, продолжай в том же духе 💪",
+            "Каждое слово делает тебя сильнее ✨",
+            "Хорошо идёшь! Лиса гордится тобой 🧡"
+    };
+    private final String hard3Phrase =
+            "Ничего страшного! Даже лиса не всё понимает с первого раза 🦊💤";
+
     private LinearLayout btnDifficultyLayout;
 
     private AppDatabase db;
@@ -43,6 +60,8 @@ public class StudyActivity extends AppCompatActivity {
         btnMedium           = findViewById(R.id.btnMedium);
         btnHard             = findViewById(R.id.btnHard);
         btnDifficultyLayout = findViewById(R.id.btnDifficultyLayout);
+        foxImage            = findViewById(R.id.foxImage);
+        bubbleText          = findViewById(R.id.bubbleText);
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
 
         toolbar.setNavigationOnClickListener(v -> finish());
@@ -57,14 +76,35 @@ public class StudyActivity extends AppCompatActivity {
         // Начальное состояние UI
         showQuestionState();
         setButtonsEnabled(false);
+        showRandomPhrase();         // стартовая фраза
+        switchFoxToNormal();        // стартовая лиса
 
         // Загрузим «должные» карточки
         loadDueCards();
 
-        // Оценки
-        btnHard.setOnClickListener(v -> gradeAndNext(3));   // Трудно
-        btnMedium.setOnClickListener(v -> gradeAndNext(4)); // Средне
-        btnEasy.setOnClickListener(v -> gradeAndNext(5));   // Легко
+        // Оценки (с добавленной логикой лисы и фраз)
+        btnHard.setOnClickListener(v -> {
+            hardClicks++;
+            if (hardClicks >= 3) {
+                hardClicks = 0;
+                switchFoxToSupport();
+                setBubbleText(hard3Phrase);
+            } else {
+                switchFoxToNormal();
+                showRandomPhrase();
+            }
+            gradeAndNext(3); // Трудно
+        });
+
+        View.OnClickListener okListener = v -> {
+            hardClicks = 0;
+            switchFoxToNormal();
+            showRandomPhrase();
+            if (v.getId() == R.id.btnMedium) gradeAndNext(4);
+            else gradeAndNext(5);
+        };
+        btnMedium.setOnClickListener(okListener);
+        btnEasy.setOnClickListener(okListener);
 
         // Показ перевода
         btnShowTranslation.setOnClickListener(v -> {
@@ -72,6 +112,7 @@ public class StudyActivity extends AppCompatActivity {
             if (c == null) return;
             tvTranslation.setText(c.getBack());
             showAnswerState(); // показываем перевод и ТОЛЬКО три кнопки сложности
+            showRandomPhrase(); // при открытии ответа — свежая фраза поддержки
         });
     }
 
@@ -90,7 +131,7 @@ public class StudyActivity extends AppCompatActivity {
         // Ответ: показан перевод, показаны сложность-кнопки, "Узнать перевод" скрыта
         tvTranslation.setVisibility(View.VISIBLE);
         btnDifficultyLayout.setVisibility(View.VISIBLE);
-        btnShowTranslation.setVisibility(View.GONE); // ← ключевой момент: НЕТ кнопки "Дальше"
+        btnShowTranslation.setVisibility(View.GONE);
     }
 
     // ---------------------------
@@ -136,7 +177,7 @@ public class StudyActivity extends AppCompatActivity {
             tvWord.setText("Повторений нет");
             tvTranslation.setVisibility(View.GONE);
             btnDifficultyLayout.setVisibility(View.GONE);
-            btnShowTranslation.setVisibility(View.GONE); // нечего показывать
+            btnShowTranslation.setVisibility(View.GONE);
             setButtonsEnabled(false);
             return;
         }
@@ -144,7 +185,7 @@ public class StudyActivity extends AppCompatActivity {
         tvWord.setText(c.getFront());
         tvTranslation.setText("");
         showQuestionState();         // каждая новая карточка начинается с режима "вопрос"
-        setButtonsEnabled(true);     // активируем кнопки оценок (хотя они скрыты до показа ответа)
+        setButtonsEnabled(true);
     }
 
     private void setButtonsEnabled(boolean enabled) {
@@ -161,7 +202,37 @@ public class StudyActivity extends AppCompatActivity {
         AppDatabase.databaseExecutor.execute(() -> {
             long now = System.currentTimeMillis();
             repo.reviewAndSchedule(current.getId(), grade, now);
-            runOnUiThread(this::showNext); // сразу следующая карточка -> снова "Узнать перевод"
+            runOnUiThread(this::showNext);
         });
+    }
+
+    // ---------------------------
+    // Облачко + лисичка
+    // ---------------------------
+
+    private void showRandomPhrase() {
+        if (bubbleText == null) return;
+        String phrase = normalPhrases[rnd.nextInt(normalPhrases.length)];
+        setBubbleText(phrase);
+    }
+
+    private void setBubbleText(String text) {
+        if (bubbleText == null) return;
+        bubbleText.animate().alpha(0f).setDuration(120).withEndAction(() -> {
+            bubbleText.setText(text);
+            bubbleText.animate().alpha(1f).setDuration(120).start();
+        }).start();
+    }
+
+    private void switchFoxToSupport() { crossfadeFox(R.drawable.fox_support); }
+
+    private void switchFoxToNormal()  { crossfadeFox(R.drawable.fox_study); }
+
+    private void crossfadeFox(int drawableRes) {
+        if (foxImage == null) return;
+        foxImage.animate().alpha(0f).setDuration(120).withEndAction(() -> {
+            foxImage.setImageResource(drawableRes);
+            foxImage.animate().alpha(1f).setDuration(120).start();
+        }).start();
     }
 }

@@ -1,53 +1,81 @@
 package com.example.cards.data.db;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import java.io.File;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public final class DbProvider {
+    private static final String TAG = "DbProvider";
+    private static final String DB_PREFIX = "cards_deck_";
+    private static final String DB_SUFFIX = ".db";
+    private static final String[] ASSET_DIRS = new String[] {
+            "",                 // assets/<file>
+            "databases/",       // assets/databases/<file>
+            "db/"               // assets/db/<file>
+    };
 
-    private static final Map<Long, AppDatabase> CACHE = new HashMap<>();
+    private static final ConcurrentMap<String, AppDatabase> CACHE = new ConcurrentHashMap<>();
 
     private DbProvider() {}
 
-    public static synchronized AppDatabase getDatabase(@NonNull Context ctx, long deckId) {
-        if (deckId < 1) throw new IllegalArgumentException("deckId must start from 1");
+    public static AppDatabase forDeck(@NonNull Context context, long deckId) {
+        String dbName = fileNameForDeck(deckId);
+        ensurePrepackagedIfNeeded(context, dbName);
+        return CACHE.computeIfAbsent(dbName, key ->
+                Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, key)
+                        // ВАЖНО: не используем createFromAsset одновременно с ручным копированием
+                        // migrations при необходимости добавляйте здесь
+                        .fallbackToDestructiveMigration() // можно оставить; не тронет уже скопированный файл
+                        .build()
+        );
+    }
 
-        AppDatabase cached = CACHE.get(deckId);
-        if (cached != null) return cached;
+    private static String fileNameForDeck(long deckId) {
+        return DB_PREFIX + deckId + DB_SUFFIX; // например, cards_deck_1.db
+    }
 
-        // ОДИН ЖЁСТКИЙ ШАБЛОН ИМЕНИ ДЛЯ ВСЕХ КОЛОД:
-        final String dbFileName = "cards_deck_" + deckId + ".db";
+    /** Если файла базы нет — попытаться скопировать из assets. */
+    private static void ensurePrepackagedIfNeeded(@NonNull Context context, @NonNull String dbName) {
+        File dbFile = context.getDatabasePath(dbName);
+        if (dbFile.exists()) return;
 
-        // (опц.) Если хочешь держать БД именно в стандартной папке БД приложения:
-        File dbPath = ctx.getDatabasePath(dbFileName);
-        File parent = dbPath.getParentFile();
+        // гарантируем, что папка databases/ существует
+        File parent = dbFile.getParentFile();
         if (parent != null && !parent.exists()) parent.mkdirs();
 
-        AppDatabase db = Room.databaseBuilder(ctx.getApplicationContext(), AppDatabase.class, dbFileName)
-                .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
-                // Если у тебя бывают изменения схемы без миграций:
-                // .fallbackToDestructiveMigration()
-                .addCallback(new RoomDatabase.Callback() {
-                    @Override public void onOpen(@NonNull SupportSQLiteDatabase db) {
-                        db.execSQL("PRAGMA foreign_keys = ON");
-                        android.util.Log.d(
-                                "DB",
-                                "Opened deck " + deckId + ": " + dbFileName +
-                                        " (" + new Date(dbPath.lastModified()) + ")"
-                        );
-                    }
-                })
-                .build();
+        boolean copied = copyFromAssets(context.getAssets(), dbName, dbFile);
+        if (!copied) {
+            Log.e(TAG, "Не удалось найти/скопировать " + dbName + " из assets. Проверьте пути и имя файла.");
+            // Создадим пустую БД, чтобы приложение не падало, но в логах будет ошибка
+            // Room потом создаст схему. Если нужно – бросайте RuntimeException вместо этого.
+        } else {
+            Log.d(TAG, "База успешно скопирована: " + dbFile.getAbsolutePath() + " (" + dbFile.length() + " байт)");
+        }
+    }
 
-        CACHE.put(deckId, db);
-        return db;
+    private static boolean copyFromAssets(AssetManager am, String dbName, File dest) {
+        for (String dir : ASSET_DIRS) {
+            String assetPath = dir + dbName;
+            try (InputStream in = am.open(assetPath);
+                 FileOutputStream out = new FileOutputStream(dest)) {
+                byte[] buf = new byte[8192];
+                int r;
+                while ((r = in.read(buf)) > 0) out.write(buf, 0, r);
+                out.flush();
+                return true;
+            } catch (Exception ignore) {
+                // пробуем следующий путь
+            }
+        }
+        return false;
     }
 }

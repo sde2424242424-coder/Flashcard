@@ -13,6 +13,21 @@
     <color name="cute_ripple">#1AF9B8C0</color>
     <!-- res/values/colors.xml -->
     <color name="cute_pink">#F8B6C4</color>
+    <color name="cute_card_stroke">#EFDCC7</color>
+    <color name="cute_brown">#7A4A32</color>
+    <color name="fox_pink">#FFB6B6</color>
+    <color name="fox_darkpink">#F57A9A</color>
+    <color name="fox_lightpink">#FFE0E0</color>
+    <color name="fox_brown">#4A3F35</color>
+    <color name="pink_primary">#FFA9C7</color>  <!-- розовый для тулбара -->
+    <color name="brown_text">#5A3E2B</color>    <!-- текст на розовом -->
+
+
+
+
+
+
+
 
 
 </resources>

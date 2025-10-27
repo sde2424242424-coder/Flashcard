@@ -32,18 +32,16 @@ public class DeckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deck);
 
-        // --- Явно логируем incoming extras и не маскируем отсутствие ключа ---
-        deckId = getIntent().getLongExtra(EXTRA_DECK_ID, -1L); // <- из -1 станет очевидно, если ключ не пришёл
+        // Получаем аргументы
+        deckId = getIntent().getLongExtra(EXTRA_DECK_ID, -1L);
         String deckTitle = getIntent().getStringExtra(EXTRA_DECK_TITLE);
         String deckDesc  = getIntent().getStringExtra(EXTRA_DECK_DESC);
 
-        Log.d("DeckActivity", "onCreate: received extras deckId=" + deckId +
+        Log.d("DeckActivity", "onCreate: deckId=" + deckId +
                 " title=" + deckTitle + " desc=" + deckDesc);
 
         if (deckId == -1L) {
-            Log.e("DeckActivity", "Missing EXTRA_DECK_ID! Aborting.");
-            // можно показать toast или finish()
-            // Toast.makeText(this, "Ошибка: не выбрана колода", Toast.LENGTH_SHORT).show();
+            Log.e("DeckActivity", "Missing EXTRA_DECK_ID! Finishing.");
             finish();
             return;
         }
@@ -61,51 +59,40 @@ public class DeckActivity extends AppCompatActivity {
         MaterialButton btnWordList = findViewById(R.id.btnWordList);
         MaterialButton btnStudy    = findViewById(R.id.btnStudy);
 
-        // До вызова фабрики — проверим ожидаемый путь файла
+        // Проверяем ожидаемый файл БД этой колоды
         String dbFileName = "cards_deck_" + deckId + ".db";
         File expected = getDatabasePath(dbFileName);
-        Log.d("DeckActivity", "expected DB file path = " + expected.getAbsolutePath() +
+        Log.d("DeckActivity", "expected DB file = " + expected.getAbsolutePath() +
                 " exists=" + expected.exists() + " size=" + expected.length());
 
-        // Открываем БД (фабрика может скопировать файл из assets при первом вызове).
-        // Оборачиваем операции с Room/SQLite в background executor, чтобы не блокировать UI.
+        // Открываем БД этой колоды (фабрика при необходимости скопирует asset)
         db = AppDatabase.DbFactory.forDeck(this, deckId);
         cardDao = db.cardDao();
 
-        // После создания Room — снова проверим файл (фабрика могла скопировать asset)
-        Log.d("DeckActivity", "after forDeck: expected.exists=" + expected.exists() + " size=" + expected.length());
+        // После открытия проверим ещё раз (вдруг скопировалось только что)
+        Log.d("DeckActivity", "after forDeck: exists=" + expected.exists() + " size=" + expected.length());
 
+        // Пример фоновой проверки содержимого (не влияет на проценты/списки)
         AppDatabase.databaseExecutor.execute(() -> {
             try {
-                // Получим путь БД в фоне (без открытия на UI потоке)
                 String dbPath = db.getOpenHelper().getReadableDatabase().getPath();
-                Log.d("DB", "Opened (background) path = " + dbPath);
+                Log.d("DB", "Opened path = " + dbPath);
 
                 int total = cardDao.countAll();
-                Log.d("DB", "[no-filter] total=" + total + " (deckId=" + deckId + ")");
+                Log.d("DB", "cards total=" + total + " (deckId=" + deckId + ")");
 
-                if (total == 0) {
-                    Log.w("DB", "Файл колоды пуст или таблица cards пуста.");
-                } else {
+                if (total > 0) {
                     List<Card> sample = cardDao.getPage(5, 0);
                     for (Card c : sample) {
-                        Log.d("DB", "[no-filter] " + c.id + " " + c.front + " / " + c.back + " deckId=" + c.deckId);
+                        Log.d("DB", "sample: id=" + c.id + " " + c.front + " / " + c.back + " deckId=" + c.deckId);
                     }
                 }
-
-                int byDeck = cardDao.countByDeck(deckId);
-                Log.d("DB", "[with-filter] byDeck=" + byDeck + " (deckId=" + deckId + ")");
-                if (byDeck == 0 && total > 0) {
-                    Log.w("DB", "В БД есть записи, но filter by deckId ничего не вернул. " +
-                            "Возможно в файле deckId других значений или DAO использует фильтр, " +
-                            "а вы ожидаете per-file БД без фильтра.");
-                }
-
             } catch (Exception e) {
                 Log.e("DB", "query error", e);
             }
         });
 
+        // Кнопки
         btnWordList.setOnClickListener(v -> {
             Intent i = new Intent(this, WordListActivity.class);
             i.putExtra(EXTRA_DECK_ID, deckId);

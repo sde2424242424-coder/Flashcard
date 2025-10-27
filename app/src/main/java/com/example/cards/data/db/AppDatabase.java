@@ -60,39 +60,80 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+    private static boolean isDbHealthy(File dbFile) {
+        if (!dbFile.exists()) return false;
+        if (dbFile.length() <= 4096) return false; // почти пустой SQLite
+
+        try (SQLiteDatabase sql = SQLiteDatabase.openDatabase(
+                dbFile.getPath(), null, SQLiteDatabase.OPEN_READONLY)) {
+
+            // есть ли таблица cards
+            try (Cursor t = sql.rawQuery(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='cards'", null)) {
+                if (!t.moveToFirst()) return false;
+            }
+            // есть ли данные (если ты действительно ожидаешь предзагруженные строки)
+            try (Cursor c = sql.rawQuery("SELECT COUNT(*) FROM cards", null)) {
+                if (c.moveToFirst()) {
+                    int n = c.getInt(0);
+                    if (n == 0) return false;
+                } else return false;
+            }
+            return true;
+        } catch (Throwable ignore) {
+            return false;
+        }
+    }
+
+    /** Копирует файл из assets в указанный путь, бросает исключение при неудаче */
+    private static void copyFromAssetsOrThrow(android.content.res.AssetManager assets,
+                                              String assetPath,
+                                              java.io.File dest) {
+        try (java.io.InputStream in = assets.open(assetPath);
+             java.io.OutputStream out = new java.io.FileOutputStream(dest)) {
+
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            out.flush();
+
+            android.util.Log.d("DB", "База успешно скопирована из assets: " + assetPath +
+                    " → " + dest.getAbsolutePath());
+
+        } catch (Exception e) {
+            android.util.Log.e("DB", "Ошибка копирования " + assetPath, e);
+            throw new RuntimeException("Failed to copy prepackaged DB: " + assetPath, e);
+        }
+    }
+
+
+
     public static class DbFactory {
         public static AppDatabase forDeck(Context ctx, long deckId) {
             String dbFileName = "cards_deck_" + deckId + ".db";
-            String assetName  = "db/cards_deck_" + deckId + ".db";
+            File dbPath = ctx.getDatabasePath(dbFileName);
+            dbPath.getParentFile().mkdirs();
 
-            // 1) Копируем из assets только если файла ещё нет
-            java.io.File dbPath = ctx.getDatabasePath(dbFileName);
-            if (!dbPath.exists()) {
-                dbPath.getParentFile().mkdirs();
-                try (java.io.InputStream in = ctx.getAssets().open(assetName);
-                     java.io.OutputStream out = new java.io.FileOutputStream(dbPath)) {
-                    byte[] buf = new byte[8192];
-                    int n;
-                    while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to copy prepackaged DB: " + assetName, e);
-                }
+            // Проверка целостности
+            if (!isDbHealthy(dbPath)) {
+                if (dbPath.exists()) dbPath.delete();
+                copyFromAssetsOrThrow(ctx.getAssets(), "db/" + dbFileName, dbPath);
+            } else {
+                Log.d("DB", "Используется существующая здоровая база: " + dbPath);
             }
 
-            // 2) Открываем СУЩЕСТВУЮЩИЙ файл без разрушительных миграций
             return Room.databaseBuilder(ctx.getApplicationContext(), AppDatabase.class, dbFileName)
-                    //.fallbackToDestructiveMigration()              // апгрейд без миграций
-                    .createFromAsset(assetName)
-                    .fallbackToDestructiveMigrationOnDowngrade()   // даунгрейд без миграций (твой случай)
                     .addCallback(new RoomDatabase.Callback() {
-                        @Override public void onOpen(@NonNull SupportSQLiteDatabase db) {
+                        @Override
+                        public void onOpen(@NonNull SupportSQLiteDatabase db) {
                             db.execSQL("PRAGMA foreign_keys = ON");
                         }
                     })
                     .build();
-
         }
+
     }
+
     public static void logUserVersion(Context ctx, String dbName) {
         File f = ctx.getDatabasePath(dbName);
         if (!f.exists()) {
@@ -111,3 +152,4 @@ public abstract class AppDatabase extends RoomDatabase {
 
 
 }
+

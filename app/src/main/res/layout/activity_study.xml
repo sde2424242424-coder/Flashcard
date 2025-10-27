@@ -4,11 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".StudyActivity">
 
-
-
-    <!-- Верхняя панель с кнопкой "назад" -->
+    <!-- Верхняя панель -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -17,57 +17,105 @@
         app:navigationIcon="@drawable/ic_arrow_back"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Лиса + облачко -->
 
-    <TextView
-        android:id="@+id/tvLabel"
+    <!-- Облачко с ободрением -->
+
+    <!-- Пилюля со словом и переводом -->
+
+    <!-- Кнопка показать перевод -->
+
+    <ImageView
+        android:id="@+id/foxImage"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="196dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/fox_study"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="313dp"
+        android:layout_height="251dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/speech_bubble"
+        android:padding="70dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <TextView
+            android:id="@+id/bubbleText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Ты справишься! 💪 Не сдавайся 💖"
+            android:textColor="#6B4B3A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.352" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/pillContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Корейское слово"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_pill"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp" />
-
-
-    <TextView
-        android:id="@+id/tvWord"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="일"
-        android:textSize="36sp"
-        app:layout_constraintTop_toBottomOf="@id/tvLabel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/noto_sans_kr"/>
+        app:layout_constraintTop_toBottomOf="@id/foxImage">
 
-    <TextView
-        android:id="@+id/tvTranslation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="перевод"
-        android:textSize="22sp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/tvWord"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/noto_sans_kr"/>
+        <TextView
+            android:id="@+id/tvWord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/noto_sans_kr"
+            android:text="일"
+            android:textColor="#5A3E2B"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvTranslation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/noto_sans_kr"
+            android:text="работа / дело"
+            android:textColor="#8B6A56"
+            android:textSize="20sp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnShowTranslation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Узнать перевод"
+        android:backgroundTint="#FFDDE2"
+        android:textColor="#5A3E2B"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="70dp"/>
+        app:layout_constraintBottom_toTopOf="@id/btnDifficultyLayout"
+        android:layout_marginBottom="50dp"/>
 
-
+    <!-- Кнопки трудности -->
     <LinearLayout
         android:id="@+id/btnDifficultyLayout"
         android:layout_width="0dp"
@@ -75,35 +123,42 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:visibility="gone"
+        android:paddingHorizontal="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="70dp"
-        android:paddingHorizontal="16dp">
+        android:layout_marginBottom="24dp">
 
         <Button
             android:id="@+id/btnHard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Трудно"/>
+            android:text="Трудно"
+            android:backgroundTint="#FFB6B9"
+            android:textColor="#5A3E2B"/>
+
+        <Space android:layout_width="8dp" android:layout_height="0dp"/>
 
         <Button
             android:id="@+id/btnMedium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:text="Средне"/>
+            android:text="Средне"
+            android:backgroundTint="#FFDCA9"
+            android:textColor="#5A3E2B"/>
+
+        <Space android:layout_width="8dp" android:layout_height="0dp"/>
 
         <Button
             android:id="@+id/btnEasy"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Легко"/>
+            android:text="Легко"
+            android:backgroundTint="#C7F5D9"
+            android:textColor="#5A3E2B"/>
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

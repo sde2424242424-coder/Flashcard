@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/cute_bg">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -22,53 +24,104 @@
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- твой LinearLayout внутри -->
-
-
-    <LinearLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Заголовок / имя колоды -->
-            <TextView
-                android:id="@+id/tvDeckTitle"
+            <!-- Hero-карточка как на скриншоте -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/heroCard"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="1. Слова 1급"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+                android:layout_height="140dp"
+                app:cardBackgroundColor="@color/cute_card_bg"
+                app:cardCornerRadius="28dp"
+                app:strokeColor="@color/cute_card_stroke"
+                app:strokeWidth="1dp">
 
-            <!-- Краткое описание колоды -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivFox"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:contentDescription="@string/desc_fox"
+                        android:src="@drawable/fox_wave"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tvDeckTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="1гр: 🦊 слова"
+                        android:textColor="@color/cute_brown"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:includeFontPadding="false"
+                        app:layout_constraintStart_toEndOf="@id/ivFox"
+                        app:layout_constraintTop_toTopOf="@id/ivFox"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginStart="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tvDeckSubtitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="для начинающих"
+                        android:textColor="@color/cute_brown"
+                        android:textSize="22sp"
+                        android:includeFontPadding="false"
+                        app:layout_constraintStart_toStartOf="@id/tvDeckTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvDeckTitle"
+                        app:layout_constraintEnd_toEndOf="@id/tvDeckTitle"
+                        android:layout_marginTop="4dp"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Описание -->
             <TextView
                 android:id="@+id/tvDeckDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="20dp"
                 android:text="Базовая лексика уровня 1급: самые частотные слова для ежедневной практики."
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+                android:textColor="@color/cute_brown"
+                android:textSize="20sp"
+                android:lineSpacingExtra="4dp" />
 
-            <!-- Кнопка для перехода на отдельный экран со списком слов -->
+            <!-- Кнопка «Список слов» (outlined/tonal) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnWordList"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Список слов" />
+                android:layout_height="64dp"
+                android:layout_marginTop="16dp"
+                android:text="Список слов"
+                android:textAllCaps="false"
+                android:textSize="22sp"
+                app:cornerRadius="26dp" />
 
-            <!-- Кнопка начать изучение (как на скрине) -->
+            <!-- Кнопка «Изучать» (filled) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStudy"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="72dp"
                 android:layout_marginTop="12dp"
-                android:text="Изучать" />
-
+                android:text="Изучать"
+                android:textAllCaps="false"
+                android:textSize="24sp"
+                app:cornerRadius="28dp"
+                app:backgroundTint="@color/cute_pink"
+                android:textColor="@android:color/white"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-

@@ -1,87 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cute_bg"
     android:padding="8dp">
 
-
-
+    <!-- Верхняя панель -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        app:navigationIcon="@drawable/ic_arrow_back"
+        android:background="@color/fox_pink"
         app:title="Мои слова"
         app:titleCentered="true"
-        app:titleTextColor="@android:color/white" />
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:titleTextColor="@android:color/white"
+        android:elevation="4dp"/>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Поиск слова">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/searchInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imeOptions="actionSearch"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-
-
-    <!-- Заголовок таблицы -->
+    <!-- Поиск -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="5"
-        android:padding="8dp"
-        android:background="#EEEEEE">
+        android:layout_margin="12dp"
+        android:background="@drawable/rounded_box"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="6dp"
+        android:elevation="2dp"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.2"
-            android:text="Слово
-"
-            android:textStyle="bold"
-            android:gravity="center"/>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_search_cute"
+            android:tint="@color/fox_brown"
+            android:layout_marginEnd="6dp"/>
 
-        <TextView
-            android:layout_width="0dp"
+        <EditText
+            android:id="@+id/searchInput"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1.5"
-            android:text="Перевод"
-            android:textStyle="bold"
-            android:gravity="center"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.7"
-            android:text="★"
-            android:textStyle="bold"
-            android:gravity="center"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            android:text="Выучено"
-            android:textStyle="bold"
-            android:gravity="center"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.6"
-            android:text="Rev"
-            android:textStyle="bold"
-            android:gravity="center"/>
+            android:hint="Поиск слова..."
+            android:textColor="@color/fox_brown"
+            android:textColorHint="@color/fox_darkpink"
+            android:background="@android:color/transparent"
+            android:imeOptions="actionSearch"
+            android:inputType="text"/>
     </LinearLayout>
+
+    <!-- Заголовок таблицы -->
 
     <!-- Список слов -->
     <ListView
@@ -89,6 +57,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp"/>
+        android:divider="@color/fox_lightpink"
+        android:dividerHeight="1dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="8dp"/>
 </LinearLayout>
