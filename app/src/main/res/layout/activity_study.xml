@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/noto_sans_kr"
             android:text="일"
-            android:textColor="#5A3E2B"
+            android:textColor="@color/word_color"
             android:textSize="36sp"
             android:textStyle="bold" />
 
@@ -99,8 +99,9 @@
             android:layout_marginTop="4dp"
             android:fontFamily="@font/noto_sans_kr"
             android:text="работа / дело"
-            android:textColor="#8B6A56"
+            android:textColor="@color/translation_color"
             android:textSize="20sp" />
+
     </LinearLayout>
 
     <Button

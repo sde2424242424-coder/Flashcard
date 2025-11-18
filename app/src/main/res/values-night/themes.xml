@@ -1,7 +1,25 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Flashcard" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+<resources>
+    <style name="Theme.Flashcard" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Основные цвета -->
+        <item name="colorPrimary">@color/pink_primary</item>
+        <item name="colorOnPrimary">@color/brown_text</item>
+        <item name="colorSurface">@color/cute_bg</item>
+
+        <!-- Системные бары -->
+        <item name="android:windowBackground">@color/cute_bg</item>
+        <item name="android:statusBarColor">@color/cute_bg</item>
+        <item name="android:navigationBarColor">@color/cute_bg</item>
+
+        <!-- Светлые иконки только в дневном режиме -->
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+        <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Flashcard.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/cute_bg</item>
     </style>
 </resources>

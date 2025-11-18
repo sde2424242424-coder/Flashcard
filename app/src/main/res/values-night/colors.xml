@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- базовые -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- фон бренда (можно оставить совсем чёрным) -->
+    <color name="brand_bg">#000000</color>
+
+    <!-- бирюзовые (чуть приглушённые в ночи) -->
+    <color name="teal_700">#018786</color>
+    <color name="teal_200">#03DAC5</color>
+
+    <!-- общий фон приложения -->
+    <color name="cute_bg">#3F384A</color>          <!-- главный тёмный фон -->
+    <!-- фон "пилюли" -->
+    <color name="cute_pill">#674ea6</color>        <!-- тёмно-розовый/фиолетовый -->
+    <!-- фон карточек -->
+    <color name="cute_card_bg">#a08fcb</color>     <!-- немного светлее фона -->
+    <!-- обводка общая -->
+    <color name="cute_stroke">#B86A7A</color>      <!-- тёмная розовая линия -->
+    <!-- основной текст -->
+    <color name="cute_text_primary">#F5E9E9</color>
+    <!-- ripples -->
+    <color name="cute_ripple">#E60B0B</color>
+
+    <!-- акцентный розовый -->
+    <color name="cute_pink">#c1a9fe</color>
+    <!-- обводка карточек -->
+    <color name="cute_card_stroke">#c1a9fe</color>
+    <!-- коричневый акцент -->
+    <color name="cute_brown">#F5E9E9</color>
+
+    <!-- цвета лисы (чуть темнее, но видимые на тёмном фоне) -->
+    <color name="fox_pink">#c1a9fe</color>
+    <color name="fox_darkpink">#F5E9E9</color>
+    <color name="fox_lightpink">#c1a9fe</color>
+    <color name="fox_brown">#F5E9E9</color>
+
+    <!-- розовый для тулбара -->
+    <color name="pink_primary">#c1a9fe</color>
+    <!-- текст на розовом -->
+    <color name="brown_text">#E91E63</color>
+
+    <!-- прогресс-бар -->
+    <color name="cute_progress">#c1a9fe</color>
+
+    <!-- фон карточек крупный -->
+    <color name="cute_bg_card">#18121A</color>
+
+    <!-- светлый розовый фон -->
+    <color name="cute_pink_light">#3A2534</color>
+    <color name="word_color">#F5E9E9</color>
+    <color name="translation_color">#F5E9E9</color>
+    <color name="bg_white">#c1a9fe</color>
+
+</resources>

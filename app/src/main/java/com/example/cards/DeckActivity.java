@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.cards.data.db.AppDatabase;
 import com.example.cards.data.db.CardDao;
 import com.example.cards.data.model.Card;
+import com.example.cards.util.ThemeHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 
@@ -21,7 +22,7 @@ public class DeckActivity extends AppCompatActivity {
 
     public static final String EXTRA_DECK_ID    = "deckId";
     public static final String EXTRA_DECK_TITLE = "deckTitle";
-    public static final String EXTRA_DECK_DESC  = "deckDescription";
+    public static final String EXTRA_DECK_DESC  = "deckDescription"; // можно не использовать, но оставлю константу
 
     private long deckId;
     private CardDao cardDao;
@@ -29,16 +30,17 @@ public class DeckActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deck);
 
         // Получаем аргументы
         deckId = getIntent().getLongExtra(EXTRA_DECK_ID, -1L);
         String deckTitle = getIntent().getStringExtra(EXTRA_DECK_TITLE);
-        String deckDesc  = getIntent().getStringExtra(EXTRA_DECK_DESC);
+        // String deckDesc  = getIntent().getStringExtra(EXTRA_DECK_DESC); // описание теперь задаём в коде
 
         Log.d("DeckActivity", "onCreate: deckId=" + deckId +
-                " title=" + deckTitle + " desc=" + deckDesc);
+                " title=" + deckTitle);
 
         if (deckId == -1L) {
             Log.e("DeckActivity", "Missing EXTRA_DECK_ID! Finishing.");
@@ -48,16 +50,25 @@ public class DeckActivity extends AppCompatActivity {
 
         // UI
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(deckTitle != null ? deckTitle : ("Колода " + deckId));
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
-
-        TextView tvTitle = findViewById(R.id.tvDeckTitle);
-        TextView tvDesc  = findViewById(R.id.tvDeckDescription);
-        if (deckTitle != null && !deckTitle.isEmpty()) tvTitle.setText(deckTitle);
-        if (deckDesc  != null && !deckDesc.isEmpty())  tvDesc.setText(deckDesc);
-
+        TextView tvTitle       = findViewById(R.id.tvDeckTitle);
+        TextView tvSubtitle    = findViewById(R.id.tvDeckSubtitle);
+        TextView tvDesc        = findViewById(R.id.tvDeckDescription);
         MaterialButton btnWordList = findViewById(R.id.btnWordList);
         MaterialButton btnStudy    = findViewById(R.id.btnStudy);
+
+        // Заголовок
+        if (deckTitle != null && !deckTitle.isEmpty()) {
+            tvTitle.setText(deckTitle);
+            toolbar.setTitle(deckTitle);
+        } else {
+            String fallbackTitle = "Колода " + deckId;
+            tvTitle.setText(fallbackTitle);
+            toolbar.setTitle(fallbackTitle);
+        }
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        // Индивидуальный subtitle + description для каждой колоды
+        setupDeckTexts((int) deckId, tvSubtitle, tvDesc);
 
         // Проверяем ожидаемый файл БД этой колоды
         String dbFileName = "cards_deck_" + deckId + ".db";
@@ -105,5 +116,51 @@ public class DeckActivity extends AppCompatActivity {
             i.putExtra(EXTRA_DECK_TITLE, tvTitle.getText().toString());
             startActivity(i);
         });
+    }
+
+    /**
+     * Задаём свои subtitle/description для каждой колоды по ее deckId.
+     * deckId в БД long, но логика колод обычно 1,2,3,...
+     */
+    private void setupDeckTexts(int deckId,
+                                TextView tvSubtitle,
+                                TextView tvDescription) {
+
+        switch (deckId) {
+            case 1:
+                tvSubtitle.setText("для начинающих");
+                tvDescription.setText("Базовая лексика уровня 1급: самые частотные слова для ежедневной практики.");
+                break;
+
+            case 2:
+                tvSubtitle.setText("продолжаем учиться");
+                tvDescription.setText("Слова уровня 2급: расширяем словарный запас для повседневных ситуаций.");
+                break;
+
+            case 3:
+                tvSubtitle.setText("уверенный уровень");
+                tvDescription.setText("Лексика 3급: более сложные слова для общения и чтения новостей.");
+                break;
+
+            case 4:
+                tvSubtitle.setText("уверенный уровень");
+                tvDescription.setText("Лексика 4급: более сложные слова для общения и чтения новостей.");
+                break;
+
+            case 5:
+                tvSubtitle.setText("уверенный уровень");
+                tvDescription.setText("Лексика 5급: более сложные слова для общения и чтения новостей.");
+                break;
+
+            case 6:
+                tvSubtitle.setText("уверенный уровень");
+                tvDescription.setText("Лексика 6급: более сложные слова для общения и чтения новостей.");
+                break;
+
+            default:
+                tvSubtitle.setText("колода");
+                tvDescription.setText("Описание колоды скоро будет добавлено.");
+                break;
+        }
     }
 }

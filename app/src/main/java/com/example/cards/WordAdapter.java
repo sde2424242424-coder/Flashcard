@@ -45,6 +45,7 @@ public class WordAdapter extends ArrayAdapter<WordWithStats> {
     static class VH {
         TextView tvFront, tvBack;
         CheckBox cbLearned;
+        View cbContainer;   // <--- добавили
     }
 
     @NonNull
@@ -54,9 +55,10 @@ public class WordAdapter extends ArrayAdapter<WordWithStats> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_word, parent, false);
             h = new VH();
-            h.tvFront   = convertView.findViewById(R.id.tvFront);
-            h.tvBack    = convertView.findViewById(R.id.tvBack);
-            h.cbLearned = convertView.findViewById(R.id.checkbox_learned);
+            h.tvFront      = convertView.findViewById(R.id.tvFront);
+            h.tvBack       = convertView.findViewById(R.id.tvBack);
+            h.cbLearned    = convertView.findViewById(R.id.checkbox_learned);
+            h.cbContainer  = convertView.findViewById(R.id.cb_container);
             convertView.setTag(h);
         } else {
             h = (VH) convertView.getTag();
@@ -65,18 +67,19 @@ public class WordAdapter extends ArrayAdapter<WordWithStats> {
         WordWithStats w = getItem(position);
         if (w == null) return convertView;
 
-        // заполняем текст
         h.tvFront.setText(w.front == null ? "" : w.front);
         h.tvBack.setText(w.back == null ? "" : w.back);
 
-        // чекбокс «выучено»
+        // снимаем старый листенер перед setChecked
         h.cbLearned.setOnCheckedChangeListener(null);
         h.cbLearned.setChecked(w.learned);
+
+        // общий код обновления БД
         h.cbLearned.setOnCheckedChangeListener((btn, checked) -> {
             final long cardId = w.cardId;
             AppDatabase.databaseExecutor.execute(() -> {
                 try {
-                    db.cardDao().setLearnedBoth(cardId, checked); // твой DAO
+                    db.cardDao().setLearnedBoth(cardId, checked);
                     main.post(() -> {
                         w.learned = checked;
                         notifyDataSetChanged();
@@ -84,17 +87,21 @@ public class WordAdapter extends ArrayAdapter<WordWithStats> {
                     });
                 } catch (Exception e) {
                     main.post(() -> {
-                        h.cbLearned.setOnCheckedChangeListener(null);
-                        h.cbLearned.setChecked(!checked);
-                        h.cbLearned.setOnCheckedChangeListener((b, c) -> {});
+                        btn.setOnCheckedChangeListener(null);
+                        btn.setChecked(!checked);
+                        btn.setOnCheckedChangeListener((b, c) -> {});
                         Toast.makeText(getContext(), "Не удалось сохранить флаг", Toast.LENGTH_SHORT).show();
                     });
                 }
             });
         });
 
+        // клик по контейнеру → клик по чекбоксу (для красивого рипла)
+        h.cbContainer.setOnClickListener(v -> h.cbLearned.performClick());
+
         return convertView;
     }
+
 
     public void updateData(@Nullable List<WordWithStats> newData) {
         setNotifyOnChange(false);

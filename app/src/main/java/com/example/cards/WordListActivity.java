@@ -14,6 +14,7 @@ import androidx.appcompat.widget.TooltipCompat;
 
 import com.example.cards.data.db.AppDatabase;
 import com.example.cards.data.model.WordWithStats;
+import com.example.cards.util.ThemeHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -29,6 +30,7 @@ public class WordListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_word_list);
 

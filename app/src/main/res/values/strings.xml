@@ -2,6 +2,10 @@
     <string name="app_name">Flashcard</string>
     <string name="search">Поиск</string>
     <string name="desc_fox">Лисичка</string>
+    <string name="settings_title">Настройки</string>
+    <string name="settings_theme">Ночной режим</string>
+    <string name="settings_reset_db">Сбросить все данные</string>
+    <string name="menu_settings">Настройки</string>
 
 
 </resources>

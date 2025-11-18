@@ -3,7 +3,15 @@ package com.example.cards;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ImageButton;
+import android.app.AlertDialog;
+import android.view.View;
+import android.widget.Button;
 
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -13,6 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cards.data.model.Deck;
 import com.example.cards.ui.DeckAdapter;
+import com.example.cards.ui.OverlapDecoration;
+import com.example.cards.util.ThemeHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -32,13 +42,18 @@ public class MainMenuActivity extends AppCompatActivity {
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu); // layout с DrawerLayout и RecyclerView @id/decksList
 
         // ==== Drawer / Toolbar ====
-        drawerLayout   = findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
-        toolbar        = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
+        ImageButton btnExit = findViewById(R.id.btn_exit);
+        btnExit.setOnClickListener(v -> showExitDialog());
+
+
 
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -67,6 +82,12 @@ public class MainMenuActivity extends AppCompatActivity {
 
         // Если нужен разделитель между элементами — раскомментируй:
         // rvDecks.addItemDecoration(new DividerItemDecoration(this, RecyclerView.VERTICAL));
+        rvDecks.setClipToPadding(false);
+        rvDecks.addItemDecoration(new OverlapDecoration(this, 0, 0));
+
+        //rvDecks.setClipToPadding(false);
+// было 120dp → слишком много. Используй 48dp подъёма и 12dp зазор.
+        //rvDecks.addItemDecoration(new OverlapDecoration(this, 48f, 12f));
 
         // Данные по колодам (подставь свой источник, если есть)
         String[] deckNames = {
@@ -100,4 +121,46 @@ public class MainMenuActivity extends AppCompatActivity {
             rvDecks.getAdapter().notifyDataSetChanged();
         }
     }
+    private void showExitDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_exit, null);
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+
+        Button btnYes = view.findViewById(R.id.btn_yes);
+        Button btnNo = view.findViewById(R.id.btn_no);
+
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+        btnYes.setOnClickListener(v -> {
+            dialog.dismiss();
+            finishAffinity();
+        });
+
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.nav_drawer_menu, menu); // твой xml меню
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) { // id пункта меню "настройки"
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+
 }

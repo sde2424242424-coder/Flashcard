@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.cards.data.db.AppDatabase;
 import com.example.cards.data.model.Card;
 import com.example.cards.domain.ReviewRepository;
+import com.example.cards.util.ThemeHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayDeque;
@@ -49,6 +50,7 @@ public class StudyActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study);
 

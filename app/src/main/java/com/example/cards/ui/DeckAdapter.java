@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cards.R;
@@ -43,7 +44,7 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
         VH(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tvTitle);
-            fox   = itemView.findViewById(R.id.imgFox);
+            fox = itemView.findViewById(R.id.imgFoxHead);
             tvPercent = itemView.findViewById(R.id.tvPercent);
             progress  = itemView.findViewById(R.id.progress);
         }
@@ -60,9 +61,18 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
         int layout = (viewType == TYPE_FIRST)
                 ? R.layout.item_deck_first
                 : R.layout.item_deck;
+
         View v = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
+
+        // просто выравнивание слоёв, не меняем Z
+        if (viewType == TYPE_FIRST) ViewCompat.setTranslationZ(v, 0f);
+        else ViewCompat.setTranslationZ(v, 1f);
+
         return new VH(v);
     }
+
+
+
 
     @Override
     public void onBindViewHolder(@NonNull VH h, int pos) {

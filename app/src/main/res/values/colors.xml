@@ -11,7 +11,6 @@
     <color name="cute_stroke">#F9B8C0</color>
     <color name="cute_text_primary">#4B3F3F</color>
     <color name="cute_ripple">#1AF9B8C0</color>
-    <!-- res/values/colors.xml -->
     <color name="cute_pink">#F8B6C4</color>
     <color name="cute_card_stroke">#EFDCC7</color>
     <color name="cute_brown">#7A4A32</color>
@@ -21,6 +20,13 @@
     <color name="fox_brown">#4A3F35</color>
     <color name="pink_primary">#FFA9C7</color>  <!-- розовый для тулбара -->
     <color name="brown_text">#5A3E2B</color>    <!-- текст на розовом -->
+    <color name="cute_progress">#C8A2C8</color>
+    <color name="cute_bg_card">#FFF6F8</color>
+    <color name="cute_pink_light">#FFE1E6</color>
+    <color name="word_color">#5A3E2B</color>
+    <color name="translation_color">#8B6A56</color>
+    <color name="bg_white">#c1a9fe</color>
+
 
 
 

@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="110dp"
-    android:paddingBottom="10dp"
-    android:paddingHorizontal="12dp"
+    android:background="@color/cute_bg"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:background="@color/cute_bg">
+    android:paddingHorizontal="12dp"
+    android:paddingTop="110dp"
+    android:paddingBottom="210dp">
 
-    <!-- Карточка-ячейка с рамкой -->
+    <!-- Пилюля -->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="android:scaleType=&quot;fitEnd&quot; " />
+
     <LinearLayout
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="@drawable/bg_pill_outline"
-        android:paddingVertical="12dp"
+        android:elevation="4dp"
+        android:orientation="vertical"
         android:paddingHorizontal="18dp"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:paddingVertical="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
-
-        <!-- Название -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
@@ -37,7 +40,6 @@
             android:textColor="@color/cute_text_primary"
             android:textSize="16sp" />
 
-        <!-- Процент + прогресс ПОД названием, внутри ячейки -->
         <LinearLayout
             android:id="@+id/percentContainer"
             android:layout_width="match_parent"
@@ -62,26 +64,45 @@
                 android:layout_marginTop="2dp"
                 android:indeterminate="false"
                 android:progress="0"
-                android:progressTint="@color/teal_200" />
+                android:progressTint="@color/cute_progress" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 🦊 Лисичка (привязана к краю ячейки) -->
     <ImageView
-        android:id="@+id/imgFox"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:padding="12dp"
+        android:id="@+id/imgFoxHead"
+        android:layout_width="155dp"
+        android:layout_height="155dp"
+        android:layout_marginTop="-120dp"
+        android:layout_marginEnd="40dp"
         android:adjustViewBounds="true"
-        android:contentDescription="@string/desc_fox"
         android:elevation="8dp"
-        android:scaleType="centerInside"
+        android:scaleType="fitCenter"
         android:src="@drawable/fox_peek"
-        android:translationX="-10dp"
-        android:translationY="-134dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        app:layout_constraintTop_toTopOf="@id/cardContainer"
-        app:layout_constraintEnd_toEndOf="@id/cardContainer"/>
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+
+        app:layout_constraintStart_toStartOf="@id/cardContainer"
+        app:layout_constraintTop_toTopOf="@id/cardContainer" />
+
+
+    <!-- 🦊 Тело под пилюлей -->
+    <ImageView
+        android:id="@+id/imgFoxBody"
+        android:layout_width="290dp"
+        android:layout_height="290dp"
+
+        android:layout_marginTop="-85dp"
+        android:layout_marginEnd="-30dp"
+        android:adjustViewBounds="true"
+        android:elevation="1dp"
+        android:scaleType="fitEnd"
+        android:src="@drawable/fox_body"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+
+        app:layout_constraintStart_toStartOf="@id/cardContainer"
+        app:layout_constraintTop_toBottomOf="@id/cardContainer" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

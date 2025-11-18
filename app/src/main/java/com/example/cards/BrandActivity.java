@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.cards.util.ThemeHelper;
+
 public class BrandActivity extends AppCompatActivity {
 
     private enum State { WALK, TURN, STAND, SIT, BOW, SIT2, STANDUP, TURNBACK }
@@ -69,6 +71,7 @@ public class BrandActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_brand);
 
