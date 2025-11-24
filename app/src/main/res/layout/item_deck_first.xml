@@ -8,7 +8,7 @@
     android:clipToPadding="false"
     android:paddingHorizontal="12dp"
     android:paddingTop="110dp"
-    android:paddingBottom="210dp">
+    android:paddingBottom="150dp">
 
     <!-- Пилюля -->
     <TextView

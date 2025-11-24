@@ -8,7 +8,7 @@
     android:padding="16dp"
     tools:context=".StudyActivity">
 
-    <!-- Верхняя панель -->
+    <!-- Top bar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -19,13 +19,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Лиса + облачко -->
+    <!-- Fox + speech bubble -->
 
-    <!-- Облачко с ободрением -->
+    <!-- Speech bubble with encouragement -->
 
-    <!-- Пилюля со словом и переводом -->
+    <!-- Pill with word and translation -->
 
-    <!-- Кнопка показать перевод -->
+    <!-- Button: show translation -->
 
     <ImageView
         android:id="@+id/foxImage"
@@ -55,7 +55,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Ты справишься! 💪 Не сдавайся 💖"
+            android:text="You can do it! 💪 Don't give up 💖"
             android:textColor="#6B4B3A"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:fontFamily="@font/noto_sans_kr"
-            android:text="работа / дело"
+            android:text="work / task"
             android:textColor="@color/translation_color"
             android:textSize="20sp" />
 
@@ -108,7 +108,7 @@
         android:id="@+id/btnShowTranslation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Узнать перевод"
+        android:text="Show translation"
         android:backgroundTint="#FFDDE2"
         android:textColor="#5A3E2B"
         app:layout_constraintStart_toStartOf="parent"
@@ -116,7 +116,7 @@
         app:layout_constraintBottom_toTopOf="@id/btnDifficultyLayout"
         android:layout_marginBottom="50dp"/>
 
-    <!-- Кнопки трудности -->
+    <!-- Difficulty buttons -->
     <LinearLayout
         android:id="@+id/btnDifficultyLayout"
         android:layout_width="0dp"
@@ -135,31 +135,36 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Трудно"
-            android:backgroundTint="#FFB6B9"
-            android:textColor="#5A3E2B"/>
+            android:text="Hard"
+            android:backgroundTint="@color/hardColor"
+            android:textColor="@color/buttonTextColor" />
 
-        <Space android:layout_width="8dp" android:layout_height="0dp"/>
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="0dp"/>
 
         <Button
             android:id="@+id/btnMedium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Средне"
-            android:backgroundTint="#FFDCA9"
-            android:textColor="#5A3E2B"/>
+            android:text="Medium"
+            android:backgroundTint="@color/mediumColor"
+            android:textColor="@color/buttonTextColor" />
 
-        <Space android:layout_width="8dp" android:layout_height="0dp"/>
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="0dp"/>
 
         <Button
             android:id="@+id/btnEasy"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Легко"
-            android:backgroundTint="#C7F5D9"
-            android:textColor="#5A3E2B"/>
+            android:text="Easy"
+            android:backgroundTint="@color/easyColor"
+            android:textColor="@color/buttonTextColor" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

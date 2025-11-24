@@ -45,7 +45,7 @@ public class WordAdapter extends ArrayAdapter<WordWithStats> {
     static class VH {
         TextView tvFront, tvBack;
         CheckBox cbLearned;
-        View cbContainer;   // <--- добавили
+        View cbContainer;   // container for checkbox click ripple
     }
 
     @NonNull
@@ -70,11 +70,11 @@ public class WordAdapter extends ArrayAdapter<WordWithStats> {
         h.tvFront.setText(w.front == null ? "" : w.front);
         h.tvBack.setText(w.back == null ? "" : w.back);
 
-        // снимаем старый листенер перед setChecked
+        // remove previous listener before setChecked to avoid unwanted triggers
         h.cbLearned.setOnCheckedChangeListener(null);
         h.cbLearned.setChecked(w.learned);
 
-        // общий код обновления БД
+        // common DB update code
         h.cbLearned.setOnCheckedChangeListener((btn, checked) -> {
             final long cardId = w.cardId;
             AppDatabase.databaseExecutor.execute(() -> {
@@ -90,18 +90,17 @@ public class WordAdapter extends ArrayAdapter<WordWithStats> {
                         btn.setOnCheckedChangeListener(null);
                         btn.setChecked(!checked);
                         btn.setOnCheckedChangeListener((b, c) -> {});
-                        Toast.makeText(getContext(), "Не удалось сохранить флаг", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Failed to save flag", Toast.LENGTH_SHORT).show();
                     });
                 }
             });
         });
 
-        // клик по контейнеру → клик по чекбоксу (для красивого рипла)
+        // click on container → click on checkbox (for better ripple effect)
         h.cbContainer.setOnClickListener(v -> h.cbLearned.performClick());
 
         return convertView;
     }
-
 
     public void updateData(@Nullable List<WordWithStats> newData) {
         setNotifyOnChange(false);

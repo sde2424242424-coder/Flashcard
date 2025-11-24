@@ -22,49 +22,51 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        // применяем тему (день/ночь)
+        // apply theme (light/dark) from preferences
         ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // тулбар "назад"
+        // toolbar back button
         MaterialToolbar toolbar = findViewById(R.id.toolbar_settings);
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        // переключатель темы
+        // theme switch
         SwitchMaterial switchTheme = findViewById(R.id.switch_theme);
-        // кнопка сброса БД
+        // reset DB button
         MaterialButton btnResetDb = findViewById(R.id.btn_reset_db);
 
-        // начальное состояние свитчера из настроек
+        // initial switch state from shared preferences
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String mode = prefs.getString(KEY_THEME, "light");
         switchTheme.setChecked("dark".equals(mode));
 
-        // смена темы
+        // theme change
         switchTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // true = тёмная
+            // true = dark theme
             ThemeHelper.setTheme(this, isChecked);
             recreate();
         });
 
-        // клик по "Сбросить все данные"
+        // click on "Reset all data"
         btnResetDb.setOnClickListener(v -> {
             new MaterialAlertDialogBuilder(this)
-                    .setTitle("Сброс данных")
-                    .setMessage("Удалить прогресс и очистить все базы данных?")
-                    .setPositiveButton("Да", (dialog, which) -> resetAllDatabases())
-                    .setNegativeButton("Отмена", null)
+                    .setTitle("Data reset")
+                    .setMessage("Delete progress and clear all databases?")
+                    .setPositiveButton("Yes", (dialog, which) -> resetAllDatabases())
+                    .setNegativeButton("Cancel", null)
                     .show();
         });
     }
 
-    /** Полный сброс: Room-база + все cards_deck_*.db */
+    /**
+     * Full reset: Room database + all cards_deck_*.db
+     */
     private void resetAllDatabases() {
         new Thread(() -> {
             Context ctx = getApplicationContext();
 
-            // 1. Очистить основную Room-базу (cards.db)
+            // 1. Clear main Room database (cards.db)
             try {
                 AppDatabase db = AppDatabase.getInstance(ctx);
                 db.clearAllTables();
@@ -72,14 +74,14 @@ public class SettingsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            // 2. При желании удалить сам файл cards.db
+            // 2. Optionally delete cards.db file itself
             try {
                 ctx.deleteDatabase("cards.db");
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            // 3. Удалить все БД колод вида cards_deck_*.db
+            // 3. Delete all deck databases cards_deck_*.db
             try {
                 String[] dbNames = ctx.databaseList();
                 if (dbNames != null) {
@@ -94,7 +96,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             runOnUiThread(() ->
-                    Toast.makeText(this, "Все данные сброшены", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "All data has been reset", Toast.LENGTH_SHORT).show()
             );
         }).start();
     }

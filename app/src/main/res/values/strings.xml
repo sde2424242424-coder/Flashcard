@@ -1,11 +1,18 @@
 <resources>
     <string name="app_name">Flashcard</string>
-    <string name="search">Поиск</string>
-    <string name="desc_fox">Лисичка</string>
-    <string name="settings_title">Настройки</string>
-    <string name="settings_theme">Ночной режим</string>
-    <string name="settings_reset_db">Сбросить все данные</string>
-    <string name="menu_settings">Настройки</string>
-
+    <string name="search">Search</string>
+    <string name="desc_fox">Fox</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme">Night mode</string>
+    <string name="settings_reset_db">Reset all data</string>
+    <string name="menu_settings">Settings</string>
+    <string name="about_description">
+    Приложение Cards предназначено для работы с карточками и отслеживания прогресса.\n\n
+    Основные функции:\n
+    • Хранение карточек\n
+    • Изучение\n
+    • Управление темой\n
+    • Настройки для пользователя
+</string>
 
 </resources>

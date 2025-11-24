@@ -10,7 +10,6 @@ import android.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,9 +41,11 @@ public class MainMenuActivity extends AppCompatActivity {
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // apply theme from preferences (light/dark)
         ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_menu); // layout с DrawerLayout и RecyclerView @id/decksList
+        // layout with DrawerLayout and RecyclerView @id/decksList
+        setContentView(R.layout.activity_main_menu);
 
         // ==== Drawer / Toolbar ====
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -52,8 +53,6 @@ public class MainMenuActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         ImageButton btnExit = findViewById(R.id.btn_exit);
         btnExit.setOnClickListener(v -> showExitDialog());
-
-
 
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -76,34 +75,52 @@ public class MainMenuActivity extends AppCompatActivity {
             });
         }
 
-        // ==== RecyclerView со списком колод ====
-        rvDecks = findViewById(R.id.decksList); // <= твой id из XML
+        // ==== RecyclerView with decks list ====
+        rvDecks = findViewById(R.id.decksList);
         rvDecks.setLayoutManager(new LinearLayoutManager(this));
 
-        // Если нужен разделитель между элементами — раскомментируй:
+        // if you need a divider between items, uncomment:
         // rvDecks.addItemDecoration(new DividerItemDecoration(this, RecyclerView.VERTICAL));
         rvDecks.setClipToPadding(false);
         rvDecks.addItemDecoration(new OverlapDecoration(this, 0, 0));
 
-        //rvDecks.setClipToPadding(false);
-// было 120dp → слишком много. Используй 48dp подъёма и 12dp зазор.
-        //rvDecks.addItemDecoration(new OverlapDecoration(this, 48f, 12f));
-
-        // Данные по колодам (подставь свой источник, если есть)
+        // deck data (replace with your data source if needed)
         String[] deckNames = {
-                "Слова 1급",
-                "Слова 2급",
-                "Слова 3급",
-                "Слова 4급",
-                "Слова 5급",
-                "Слова 6급"
+                "Words Level 1, Part 1", // 1
+                "Words Level 1, Part 2", // 2
+                "Words Level 2, Part 1", // 3
+                "Words Level 2, Part 2", // 4
+                "Words Level 2, Part 3", // 5
+                "Words Level 3, Part 1", // 6
+                "Words Level 3, Part 2", // 7
+                "Words Level 3, Part 3", // 8
+                "Words Level 3, Part 4", // 9
+                "Words Level 3, Part 5", // 10
+                "Words Level 4, Part 1", // 11
+                "Words Level 4, Part 2", // 12
+                "Words Level 4, Part 3", // 13
+                "Words Level 4, Part 4", // 14
+                "Words Level 4, Part 5", // 15
+                "Words Level 4, Part 6", // 16
+                "Words Level 5, Part 1", // 17
+                "Words Level 5, Part 2", // 18
+                "Words Level 5, Part 3", // 19
+                "Words Level 5, Part 4", // 20
+                "Words Level 5, Part 5", // 21
+                "Words Level 5, Part 6", // 22
+                "Words Level 6, Part 1", // 23
+                "Words Level 6, Part 2", // 24
+                "Words Level 6, Part 3", // 25
+                "Words Level 6, Part 4", // 26
+                "Words Level 6, Part 5"  // 27
         };
+
         decks.clear();
         for (int i = 0; i < deckNames.length; i++) {
             decks.add(new Deck(i + 1, (i + 1) + ". " + deckNames[i]));
         }
 
-        // Адаптер: клик открывает экран колоды (DeckActivity)
+        // adapter: click opens deck screen (DeckActivity)
         adapter = new DeckAdapter(decks, deck -> {
             Intent i = new Intent(MainMenuActivity.this, DeckActivity.class);
             i.putExtra(DeckActivity.EXTRA_DECK_ID, deck.id);
@@ -116,11 +133,12 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Перебиндить элементы → адаптер снова посчитает % для каждой колоды
+        // re-bind items → adapter recalculates progress for each deck
         if (rvDecks != null && rvDecks.getAdapter() != null) {
             rvDecks.getAdapter().notifyDataSetChanged();
         }
     }
+
     private void showExitDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.dialog_exit, null);
@@ -136,13 +154,16 @@ public class MainMenuActivity extends AppCompatActivity {
             finishAffinity();
         });
 
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
         dialog.show();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.nav_drawer_menu, menu); // твой xml меню
+        // your menu XML
+        getMenuInflater().inflate(R.menu.nav_drawer_menu, menu);
         return true;
     }
 
@@ -150,7 +171,8 @@ public class MainMenuActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) { // id пункта меню "настройки"
+        // menu item "settings"
+        if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
@@ -158,9 +180,4 @@ public class MainMenuActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-
-
-
-
 }

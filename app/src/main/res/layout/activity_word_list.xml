@@ -7,19 +7,19 @@
     android:background="@color/cute_bg"
     android:padding="8dp">
 
-    <!-- Верхняя панель -->
+    <!-- Top bar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/fox_pink"
-        app:title="Мои слова"
+        app:title="My words"
         app:titleCentered="true"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:titleTextColor="@android:color/white"
         android:elevation="4dp"/>
 
-    <!-- Поиск -->
+    <!-- Search -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
             android:id="@+id/searchInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Поиск слова..."
+            android:hint="Search word..."
             android:textColor="@color/fox_brown"
             android:textColorHint="@color/fox_darkpink"
             android:background="@android:color/transparent"
@@ -49,9 +49,9 @@
             android:inputType="text"/>
     </LinearLayout>
 
-    <!-- Заголовок таблицы -->
+    <!-- Table header -->
 
-    <!-- Список слов -->
+    <!-- Word list -->
     <ListView
         android:id="@+id/listWords"
         android:layout_width="match_parent"

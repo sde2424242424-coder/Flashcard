@@ -28,20 +28,20 @@ public class StudyActivity extends AppCompatActivity {
     private Button btnShowTranslation, btnEasy, btnMedium, btnHard;
     private TextView tvWord, tvTranslation;
 
-    // ---- Новые поля (лиса + облачко) ----
+    // ---- New fields (fox + bubble) ----
     private ImageView foxImage;
     private TextView bubbleText;
     private int hardClicks = 0;
     private final Random rnd = new Random();
 
     private final String[] normalPhrases = new String[] {
-            "Отлично! Ещё чуть-чуть 🦊",
-            "Ты молодец, продолжай в том же духе 💪",
-            "Каждое слово делает тебя сильнее ✨",
-            "Хорошо идёшь! Лиса гордится тобой 🧡"
+            "Great! Just a little more 🦊",
+            "You’re doing great, keep it up 💪",
+            "Every word makes you stronger ✨",
+            "You’re doing well! The fox is proud of you 🧡"
     };
     private final String hard3Phrase =
-            "Ничего страшного! Даже лиса не всё понимает с первого раза 🦊💤";
+            "It’s okay! Even the fox doesn’t understand everything the first time 🦊💤";
 
     private LinearLayout btnDifficultyLayout;
 
@@ -75,16 +75,16 @@ public class StudyActivity extends AppCompatActivity {
         db = AppDatabase.DbFactory.forDeck(this, deckId);
         repo = new ReviewRepository(db.reviewDao());
 
-        // Начальное состояние UI
+        // Initial UI state
         showQuestionState();
         setButtonsEnabled(false);
-        showRandomPhrase();         // стартовая фраза
-        switchFoxToNormal();        // стартовая лиса
+        showRandomPhrase();         // initial phrase
+        switchFoxToNormal();        // initial fox state
 
-        // Загрузим «должные» карточки
+        // Load due cards
         loadDueCards();
 
-        // Оценки (с добавленной логикой лисы и фраз)
+        // Answers (with fox + phrase logic)
         btnHard.setOnClickListener(v -> {
             hardClicks++;
             if (hardClicks >= 3) {
@@ -95,7 +95,7 @@ public class StudyActivity extends AppCompatActivity {
                 switchFoxToNormal();
                 showRandomPhrase();
             }
-            gradeAndNext(3); // Трудно
+            gradeAndNext(3); // Hard
         });
 
         View.OnClickListener okListener = v -> {
@@ -108,54 +108,54 @@ public class StudyActivity extends AppCompatActivity {
         btnMedium.setOnClickListener(okListener);
         btnEasy.setOnClickListener(okListener);
 
-        // Показ перевода
+        // Show translation
         btnShowTranslation.setOnClickListener(v -> {
             Card c = queue.peekFirst();
             if (c == null) return;
             tvTranslation.setText(c.getBack());
-            showAnswerState(); // показываем перевод и ТОЛЬКО три кнопки сложности
-            showRandomPhrase(); // при открытии ответа — свежая фраза поддержки
+            showAnswerState(); // show translation and ONLY difficulty buttons
+            showRandomPhrase(); // new support phrase when showing answer
         });
     }
 
     // ---------------------------
-    // Состояния экрана
+    // Screen states
     // ---------------------------
 
     private void showQuestionState() {
-        // Вопрос: скрыт перевод, скрыты кнопки сложности, видна "Узнать перевод"
+        // Question: translation hidden, difficulty buttons hidden, "Show translation" visible
         tvTranslation.setVisibility(View.GONE);
         btnDifficultyLayout.setVisibility(View.GONE);
         btnShowTranslation.setVisibility(View.VISIBLE);
     }
 
     private void showAnswerState() {
-        // Ответ: показан перевод, показаны сложность-кнопки, "Узнать перевод" скрыта
+        // Answer: translation visible, difficulty buttons visible, "Show translation" hidden
         tvTranslation.setVisibility(View.VISIBLE);
         btnDifficultyLayout.setVisibility(View.VISIBLE);
         btnShowTranslation.setVisibility(View.GONE);
     }
 
     // ---------------------------
-    // Бизнес-логика
+    // Business logic
     // ---------------------------
 
     private void loadDueCards() {
         AppDatabase.databaseExecutor.execute(() -> {
             long now = System.currentTimeMillis();
 
-            int cardsBefore = db.reviewDao().countStates(deckId);
+            int cardsBefore   = db.reviewDao().countStates(deckId);
             db.reviewDao().seedReviewState(deckId, now);
 
-            int excl = db.reviewDao().countExcluded(deckId);
-            int learnedCards = db.reviewDao().countLearnedCards(deckId);
-            int states = db.reviewDao().countStates(deckId);
-            int dueN   = db.reviewDao().countDue(deckId, now);
+            int excl          = db.reviewDao().countExcluded(deckId);
+            int learnedCards  = db.reviewDao().countLearnedCards(deckId);
+            int states        = db.reviewDao().countStates(deckId);
+            int dueN          = db.reviewDao().countDue(deckId, now);
 
             List<Card> due = repo.getDueCards(deckId, now, 800);
 
             runOnUiThread(() -> {
-                Toast.makeText(
+                /*Toast.makeText(
                         this,
                         "states(before)=" + cardsBefore +
                                 "  excl=" + excl +
@@ -164,7 +164,7 @@ public class StudyActivity extends AppCompatActivity {
                                 "  due=" + dueN +
                                 "  queued=" + (due != null ? due.size() : 0),
                         Toast.LENGTH_LONG
-                ).show();
+                ).show();*/
 
                 queue.clear();
                 if (due != null) queue.addAll(due);
@@ -176,7 +176,7 @@ public class StudyActivity extends AppCompatActivity {
     private void showNext() {
         Card c = queue.peekFirst();
         if (c == null) {
-            tvWord.setText("Повторений нет");
+            tvWord.setText("No cards to review");
             tvTranslation.setVisibility(View.GONE);
             btnDifficultyLayout.setVisibility(View.GONE);
             btnShowTranslation.setVisibility(View.GONE);
@@ -186,7 +186,7 @@ public class StudyActivity extends AppCompatActivity {
 
         tvWord.setText(c.getFront());
         tvTranslation.setText("");
-        showQuestionState();         // каждая новая карточка начинается с режима "вопрос"
+        showQuestionState();         // each new card starts in "question" mode
         setButtonsEnabled(true);
     }
 
@@ -209,7 +209,7 @@ public class StudyActivity extends AppCompatActivity {
     }
 
     // ---------------------------
-    // Облачко + лисичка
+    // Speech bubble + fox
     // ---------------------------
 
     private void showRandomPhrase() {
@@ -226,9 +226,13 @@ public class StudyActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void switchFoxToSupport() { crossfadeFox(R.drawable.fox_support); }
+    private void switchFoxToSupport() {
+        crossfadeFox(R.drawable.fox_support);
+    }
 
-    private void switchFoxToNormal()  { crossfadeFox(R.drawable.fox_study); }
+    private void switchFoxToNormal() {
+        crossfadeFox(R.drawable.fox_study);
+    }
 
     private void crossfadeFox(int drawableRes) {
         if (foxImage == null) return;

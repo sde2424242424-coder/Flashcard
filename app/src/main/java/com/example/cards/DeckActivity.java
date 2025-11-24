@@ -22,7 +22,7 @@ public class DeckActivity extends AppCompatActivity {
 
     public static final String EXTRA_DECK_ID    = "deckId";
     public static final String EXTRA_DECK_TITLE = "deckTitle";
-    public static final String EXTRA_DECK_DESC  = "deckDescription"; // можно не использовать, но оставлю константу
+    public static final String EXTRA_DECK_DESC  = "deckDescription"; // can be unused, keep constant
 
     private long deckId;
     private CardDao cardDao;
@@ -34,10 +34,10 @@ public class DeckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deck);
 
-        // Получаем аргументы
+        // Get extras
         deckId = getIntent().getLongExtra(EXTRA_DECK_ID, -1L);
         String deckTitle = getIntent().getStringExtra(EXTRA_DECK_TITLE);
-        // String deckDesc  = getIntent().getStringExtra(EXTRA_DECK_DESC); // описание теперь задаём в коде
+        // String deckDesc  = getIntent().getStringExtra(EXTRA_DECK_DESC);
 
         Log.d("DeckActivity", "onCreate: deckId=" + deckId +
                 " title=" + deckTitle);
@@ -49,41 +49,41 @@ public class DeckActivity extends AppCompatActivity {
         }
 
         // UI
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        TextView tvTitle       = findViewById(R.id.tvDeckTitle);
-        TextView tvSubtitle    = findViewById(R.id.tvDeckSubtitle);
-        TextView tvDesc        = findViewById(R.id.tvDeckDescription);
+        MaterialToolbar toolbar   = findViewById(R.id.toolbar);
+        TextView tvTitle          = findViewById(R.id.tvDeckTitle);
+        TextView tvSubtitle       = findViewById(R.id.tvDeckSubtitle);
+        TextView tvDesc           = findViewById(R.id.tvDeckDescription);
         MaterialButton btnWordList = findViewById(R.id.btnWordList);
         MaterialButton btnStudy    = findViewById(R.id.btnStudy);
 
-        // Заголовок
+        // Title
         if (deckTitle != null && !deckTitle.isEmpty()) {
             tvTitle.setText(deckTitle);
             toolbar.setTitle(deckTitle);
         } else {
-            String fallbackTitle = "Колода " + deckId;
+            String fallbackTitle = "Deck " + deckId;
             tvTitle.setText(fallbackTitle);
             toolbar.setTitle(fallbackTitle);
         }
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        // Индивидуальный subtitle + description для каждой колоды
+        // Individual subtitle + description for each deck
         setupDeckTexts((int) deckId, tvSubtitle, tvDesc);
 
-        // Проверяем ожидаемый файл БД этой колоды
+        // Expected DB file for this deck
         String dbFileName = "cards_deck_" + deckId + ".db";
         File expected = getDatabasePath(dbFileName);
         Log.d("DeckActivity", "expected DB file = " + expected.getAbsolutePath() +
                 " exists=" + expected.exists() + " size=" + expected.length());
 
-        // Открываем БД этой колоды (фабрика при необходимости скопирует asset)
+        // Open DB for this deck (factory will copy from assets if needed)
         db = AppDatabase.DbFactory.forDeck(this, deckId);
         cardDao = db.cardDao();
 
-        // После открытия проверим ещё раз (вдруг скопировалось только что)
+        // Check again after opening (in case it was just copied)
         Log.d("DeckActivity", "after forDeck: exists=" + expected.exists() + " size=" + expected.length());
 
-        // Пример фоновой проверки содержимого (не влияет на проценты/списки)
+        // Example of background check (does not affect progress/lists)
         AppDatabase.databaseExecutor.execute(() -> {
             try {
                 String dbPath = db.getOpenHelper().getReadableDatabase().getPath();
@@ -103,7 +103,7 @@ public class DeckActivity extends AppCompatActivity {
             }
         });
 
-        // Кнопки
+        // Buttons
         btnWordList.setOnClickListener(v -> {
             Intent i = new Intent(this, WordListActivity.class);
             i.putExtra(EXTRA_DECK_ID, deckId);
@@ -119,8 +119,8 @@ public class DeckActivity extends AppCompatActivity {
     }
 
     /**
-     * Задаём свои subtitle/description для каждой колоды по ее deckId.
-     * deckId в БД long, но логика колод обычно 1,2,3,...
+     * Set subtitle/description for each deck by its deckId.
+     * deckId in DB is long, but logical IDs are 1,2,3,...
      */
     private void setupDeckTexts(int deckId,
                                 TextView tvSubtitle,
@@ -128,38 +128,143 @@ public class DeckActivity extends AppCompatActivity {
 
         switch (deckId) {
             case 1:
-                tvSubtitle.setText("для начинающих");
-                tvDescription.setText("Базовая лексика уровня 1급: самые частотные слова для ежедневной практики.");
+                tvSubtitle.setText("for beginners");
+                tvDescription.setText("Basic vocabulary of level 1급, part 1: the most frequent starter words for daily practice.");
                 break;
 
             case 2:
-                tvSubtitle.setText("продолжаем учиться");
-                tvDescription.setText("Слова уровня 2급: расширяем словарный запас для повседневных ситуаций.");
+                tvSubtitle.setText("for beginners");
+                tvDescription.setText("Basic vocabulary of level 1급, part 2: additional essential words for initial learning and everyday use.");
                 break;
 
             case 3:
-                tvSubtitle.setText("уверенный уровень");
-                tvDescription.setText("Лексика 3급: более сложные слова для общения и чтения новостей.");
+                tvSubtitle.setText("keep learning");
+                tvDescription.setText("Level 2급 vocabulary, part 1: expanding your word stock for everyday situations and basic conversations.");
                 break;
 
             case 4:
-                tvSubtitle.setText("уверенный уровень");
-                tvDescription.setText("Лексика 4급: более сложные слова для общения и чтения новостей.");
+                tvSubtitle.setText("keep learning");
+                tvDescription.setText("Level 2급 vocabulary, part 2: more practical words to improve fluency in daily communication.");
                 break;
 
             case 5:
-                tvSubtitle.setText("уверенный уровень");
-                tvDescription.setText("Лексика 5급: более сложные слова для общения и чтения новостей.");
+                tvSubtitle.setText("keep learning");
+                tvDescription.setText("Level 2급 vocabulary, part 3: additional useful terms for confident interaction in common scenarios.");
                 break;
 
             case 6:
-                tvSubtitle.setText("уверенный уровень");
-                tvDescription.setText("Лексика 6급: более сложные слова для общения и чтения новостей.");
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 3급 vocabulary, part 1: more advanced words for conversations and reading simple news.");
+                break;
+
+            case 7:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 3급 vocabulary, part 2: expanding your vocabulary for broader topics and written content.");
+                break;
+
+            case 8:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 3급 vocabulary, part 3: additional advanced terms to strengthen reading and speaking skills.");
+                break;
+
+            case 9:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 3급 vocabulary, part 4: further lexical expansion for more detailed discussions.");
+                break;
+
+            case 10:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 3급 vocabulary, part 5: reinforcing advanced usage for daily and academic contexts.");
+                break;
+
+            case 11:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 4급 vocabulary, part 1: advanced words suitable for reading news and extended conversations.");
+                break;
+
+            case 12:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 4급 vocabulary, part 2: additional terminology to support fluent comprehension and expression.");
+                break;
+
+            case 13:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 4급 vocabulary, part 3: more high-level words for understanding various topics.");
+                break;
+
+            case 14:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 4급 vocabulary, part 4: strengthening command of complex vocabulary for nuanced situations.");
+                break;
+
+            case 15:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 4급 vocabulary, part 5: extended word set for advanced reading and structured dialogues.");
+                break;
+
+            case 16:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 4급 vocabulary, part 6: additional complex terms for improved language precision.");
+                break;
+
+            case 17:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 5급 vocabulary, part 1: high-level words for professional, academic, and detailed discussions.");
+                break;
+
+            case 18:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 5급 vocabulary, part 2: expanding advanced lexical resources for complex texts.");
+                break;
+
+            case 19:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 5급 vocabulary, part 3: additional high-level terms for precise communication.");
+                break;
+
+            case 20:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 5급 vocabulary, part 4: vocabulary aimed at deeper comprehension of long, informative texts.");
+                break;
+
+            case 21:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 5급 vocabulary, part 5: strengthening mastery of advanced expressions across various topics.");
+                break;
+
+            case 22:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 5급 vocabulary, part 6: further advanced words for confident reading and speaking at a high level.");
+                break;
+
+            case 23:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 6급 vocabulary, part 1: top-level Korean words used in academic, news, and formal contexts.");
+                break;
+
+            case 24:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 6급 vocabulary, part 2: additional sophisticated terms for nuanced comprehension.");
+                break;
+
+            case 25:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 6급 vocabulary, part 3: vocabulary required for understanding complex articles and discussions.");
+                break;
+
+            case 26:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 6급 vocabulary, part 4: extended academic and professional terminology for expert-level use.");
+                break;
+
+            case 27:
+                tvSubtitle.setText("confident level");
+                tvDescription.setText("Level 6급 vocabulary, part 5: the most advanced words for full proficiency in all communication domains.");
                 break;
 
             default:
-                tvSubtitle.setText("колода");
-                tvDescription.setText("Описание колоды скоро будет добавлено.");
+                tvSubtitle.setText("deck");
+                tvDescription.setText("Deck description will be added soon.");
                 break;
         }
     }

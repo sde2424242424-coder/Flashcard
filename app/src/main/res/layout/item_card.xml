@@ -17,6 +17,6 @@
         android:id="@+id/tvBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="работа; день"
+        android:text="work; day"
         android:layout_marginTop="4dp" />
 </LinearLayout>

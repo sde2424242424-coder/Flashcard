@@ -33,9 +33,9 @@
 
     <!-- цвета лисы (чуть темнее, но видимые на тёмном фоне) -->
     <color name="fox_pink">#c1a9fe</color>
-    <color name="fox_darkpink">#F5E9E9</color>
+    <color name="fox_darkpink">#9d77fe</color>
     <color name="fox_lightpink">#c1a9fe</color>
-    <color name="fox_brown">#F5E9E9</color>
+    <color name="fox_brown">#9d77fe</color>
 
     <!-- розовый для тулбара -->
     <color name="pink_primary">#c1a9fe</color>
@@ -52,6 +52,13 @@
     <color name="cute_pink_light">#3A2534</color>
     <color name="word_color">#F5E9E9</color>
     <color name="translation_color">#F5E9E9</color>
-    <color name="bg_white">#c1a9fe</color>
+    <color name="bg_white">#F5E9E9</color>
+    <color name="hardColor">#C27BA0</color>
+    <color name="mediumColor">#A68BB7</color>
+    <color name="easyColor">#7DA6C7</color>
+    <color name="buttonTextColor">#5A3E2B</color>
+    <color name="checkStroke">#F5E9E9</color>
+
+
 
 </resources>

@@ -25,7 +25,13 @@
     <color name="cute_pink_light">#FFE1E6</color>
     <color name="word_color">#5A3E2B</color>
     <color name="translation_color">#8B6A56</color>
-    <color name="bg_white">#c1a9fe</color>
+    <color name="bg_white">#FDE9EC</color>
+    <color name="hardColor">#FFB6B9</color>
+    <color name="mediumColor">#FFDCA9</color>
+    <color name="easyColor">#C7F5D9</color>
+    <color name="buttonTextColor">#5A3E2B</color>
+    <color name="checkStroke">#F48FB1</color>
+
 
 
 
