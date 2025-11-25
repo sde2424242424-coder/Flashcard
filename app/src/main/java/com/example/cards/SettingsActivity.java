@@ -15,41 +15,59 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
+/**
+ * SettingsActivity
+ *
+ * Screen that allows the user to:
+ * - Toggle the application theme (light / dark).
+ * - Reset all application data (clear main and per-deck databases).
+ *
+ * Responsibilities:
+ * - Read and apply the saved theme mode from SharedPreferences.
+ * - Persist theme changes through ThemeHelper.
+ * - Provide a confirmation dialog before deleting all data.
+ * - Clear all Room databases and show a confirmation message.
+ */
 public class SettingsActivity extends AppCompatActivity {
 
+    // Name of the SharedPreferences file used to store settings.
     private static final String PREFS_NAME = "app_settings";
+    // Key used for storing the current theme mode.
     private static final String KEY_THEME  = "theme_mode";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        // apply theme (light/dark) from preferences
+        // Apply theme (light/dark) from preferences before inflating layout.
         ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // toolbar back button
+        // Toolbar with back button.
         MaterialToolbar toolbar = findViewById(R.id.toolbar_settings);
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        // theme switch
+        // Theme switch: toggles between light and dark mode.
         SwitchMaterial switchTheme = findViewById(R.id.switch_theme);
-        // reset DB button
+        // "Reset DB" button: clears all app data.
         MaterialButton btnResetDb = findViewById(R.id.btn_reset_db);
 
-        // initial switch state from shared preferences
+        // Initial switch state based on stored theme preference.
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String mode = prefs.getString(KEY_THEME, "light");
+        // Checked = dark theme; unchecked = light theme.
         switchTheme.setChecked("dark".equals(mode));
 
-        // theme change
+        // Handle theme changes when user toggles the switch.
         switchTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // true = dark theme
+            // true -> dark theme, false -> light theme.
             ThemeHelper.setTheme(this, isChecked);
+            // Recreate activity to apply the new theme immediately.
             recreate();
         });
 
-        // click on "Reset all data"
+        // Click listener for "Reset all data" button.
         btnResetDb.setOnClickListener(v -> {
+            // Show confirmation dialog before deleting all databases.
             new MaterialAlertDialogBuilder(this)
                     .setTitle("Data reset")
                     .setMessage("Delete progress and clear all databases?")
@@ -60,13 +78,19 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Full reset: Room database + all cards_deck_*.db
+     * Performs a full reset of all application data:
+     * 1. Clears all tables in the main Room database (cards.db).
+     * 2. Deletes the main database file if it exists.
+     * 3. Deletes all per-deck databases whose names start with "cards_deck_".
+     *
+     * This work is done in a background thread and a confirmation Toast is
+     * shown on the main thread when the reset completes.
      */
     private void resetAllDatabases() {
         new Thread(() -> {
             Context ctx = getApplicationContext();
 
-            // 1. Clear main Room database (cards.db)
+            // 1. Clear main Room database (cards.db) tables.
             try {
                 AppDatabase db = AppDatabase.getInstance(ctx);
                 db.clearAllTables();
@@ -74,14 +98,14 @@ public class SettingsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            // 2. Optionally delete cards.db file itself
+            // 2. Optionally delete the main database file itself.
             try {
                 ctx.deleteDatabase("cards.db");
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            // 3. Delete all deck databases cards_deck_*.db
+            // 3. Delete all deck-specific databases (cards_deck_*.db).
             try {
                 String[] dbNames = ctx.databaseList();
                 if (dbNames != null) {
@@ -95,6 +119,7 @@ public class SettingsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
+            // Notify user on the main thread that all data has been reset.
             runOnUiThread(() ->
                     Toast.makeText(this, "All data has been reset", Toast.LENGTH_SHORT).show()
             );

@@ -18,11 +18,30 @@ import com.google.android.material.button.MaterialButton;
 import java.io.File;
 import java.util.List;
 
+/**
+ * DeckActivity
+ *
+ * Screen that represents a single vocabulary deck.
+ * Responsibilities:
+ * - Display deck title, subtitle (level), and description.
+ * - Open deck-specific database file (cards_deck_{deckId}.db) via AppDatabase.DbFactory.
+ * - Provide navigation to:
+ *   - {@link WordListActivity}: full list of words in this deck.
+ *   - {@link StudyActivity}: study / review session for this deck.
+ *
+ * Behavior:
+ * - Receives deckId and deckTitle via Intent extras.
+ * - Validates deckId (closes if missing).
+ * - Logs basic DB information and a sample of cards for debugging.
+ */
 public class DeckActivity extends AppCompatActivity {
 
+    /** Intent extra: logical deck ID (1..N). */
     public static final String EXTRA_DECK_ID    = "deckId";
+    /** Intent extra: human-readable deck title. */
     public static final String EXTRA_DECK_TITLE = "deckTitle";
-    public static final String EXTRA_DECK_DESC  = "deckDescription"; // can be unused, keep constant
+    /** Optional extra: deck description (currently unused). */
+    public static final String EXTRA_DECK_DESC  = "deckDescription";
 
     private long deckId;
     private CardDao cardDao;
@@ -30,17 +49,17 @@ public class DeckActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // Apply theme (light/dark) before inflating layout.
         ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deck);
 
-        // Get extras
+        // --- Read extras ---
         deckId = getIntent().getLongExtra(EXTRA_DECK_ID, -1L);
         String deckTitle = getIntent().getStringExtra(EXTRA_DECK_TITLE);
         // String deckDesc  = getIntent().getStringExtra(EXTRA_DECK_DESC);
 
-        Log.d("DeckActivity", "onCreate: deckId=" + deckId +
-                " title=" + deckTitle);
+        Log.d("DeckActivity", "onCreate: deckId=" + deckId + " title=" + deckTitle);
 
         if (deckId == -1L) {
             Log.e("DeckActivity", "Missing EXTRA_DECK_ID! Finishing.");
@@ -48,15 +67,15 @@ public class DeckActivity extends AppCompatActivity {
             return;
         }
 
-        // UI
-        MaterialToolbar toolbar   = findViewById(R.id.toolbar);
-        TextView tvTitle          = findViewById(R.id.tvDeckTitle);
-        TextView tvSubtitle       = findViewById(R.id.tvDeckSubtitle);
-        TextView tvDesc           = findViewById(R.id.tvDeckDescription);
+        // --- UI bindings ---
+        MaterialToolbar toolbar    = findViewById(R.id.toolbar);
+        TextView tvTitle           = findViewById(R.id.tvDeckTitle);
+        TextView tvSubtitle        = findViewById(R.id.tvDeckSubtitle);
+        TextView tvDesc            = findViewById(R.id.tvDeckDescription);
         MaterialButton btnWordList = findViewById(R.id.btnWordList);
         MaterialButton btnStudy    = findViewById(R.id.btnStudy);
 
-        // Title
+        // --- Title / toolbar setup ---
         if (deckTitle != null && !deckTitle.isEmpty()) {
             tvTitle.setText(deckTitle);
             toolbar.setTitle(deckTitle);
@@ -67,23 +86,27 @@ public class DeckActivity extends AppCompatActivity {
         }
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        // Individual subtitle + description for each deck
+        // Per-deck subtitle and description.
         setupDeckTexts((int) deckId, tvSubtitle, tvDesc);
 
-        // Expected DB file for this deck
+        // --- Deck-specific database file ---
         String dbFileName = "cards_deck_" + deckId + ".db";
         File expected = getDatabasePath(dbFileName);
-        Log.d("DeckActivity", "expected DB file = " + expected.getAbsolutePath() +
-                " exists=" + expected.exists() + " size=" + expected.length());
+        Log.d(
+                "DeckActivity",
+                "expected DB file = " + expected.getAbsolutePath() +
+                        " exists=" + expected.exists() +
+                        " size=" + expected.length()
+        );
 
-        // Open DB for this deck (factory will copy from assets if needed)
+        // Open DB for this deck (factory will copy from assets if needed).
         db = AppDatabase.DbFactory.forDeck(this, deckId);
         cardDao = db.cardDao();
 
-        // Check again after opening (in case it was just copied)
+        // Log again after opening (in case DB was just copied).
         Log.d("DeckActivity", "after forDeck: exists=" + expected.exists() + " size=" + expected.length());
 
-        // Example of background check (does not affect progress/lists)
+        // Optional background diagnostics: print DB path and a small sample of cards.
         AppDatabase.databaseExecutor.execute(() -> {
             try {
                 String dbPath = db.getOpenHelper().getReadableDatabase().getPath();
@@ -103,13 +126,15 @@ public class DeckActivity extends AppCompatActivity {
             }
         });
 
-        // Buttons
+        // --- Buttons ---
+        // Open word list screen for this deck.
         btnWordList.setOnClickListener(v -> {
             Intent i = new Intent(this, WordListActivity.class);
             i.putExtra(EXTRA_DECK_ID, deckId);
             startActivity(i);
         });
 
+        // Open study screen for this deck.
         btnStudy.setOnClickListener(v -> {
             Intent i = new Intent(this, StudyActivity.class);
             i.putExtra(EXTRA_DECK_ID, deckId);
@@ -119,8 +144,12 @@ public class DeckActivity extends AppCompatActivity {
     }
 
     /**
-     * Set subtitle/description for each deck by its deckId.
-     * deckId in DB is long, but logical IDs are 1,2,3,...
+     * Configures subtitle and description for a deck based on its numeric ID.
+     * Deck IDs are 1..27 and are mapped to TOPIK-like levels (1급..6급).
+     *
+     * @param deckId        logical deck ID
+     * @param tvSubtitle    TextView for short subtitle (e.g. "for beginners")
+     * @param tvDescription TextView for longer per-deck description
      */
     private void setupDeckTexts(int deckId,
                                 TextView tvSubtitle,

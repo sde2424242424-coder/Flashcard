@@ -11,20 +11,36 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.cards.util.ThemeHelper;
 
+/**
+ * AboutActivity
+ *
+ * Simple informational screen that displays basic information about the
+ * application: name, version, description, and main features.
+ *
+ * Responsibilities:
+ * - Apply the current theme before inflating the layout.
+ * - Build and show a static "About" text.
+ * - Handle edge-to-edge insets for proper padding on modern devices.
+ */
 public class AboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Apply light/dark theme from preferences before setting content view.
         ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
+
+        // Enable edge-to-edge content (status/navigation bar handling).
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_about);
 
         TextView aboutText = findViewById(R.id.aboutText);
 
-        //String versionName = BuildConfig.VERSION_NAME;
+        // If needed, you can use BuildConfig.VERSION_NAME instead of a hard-coded version.
+        // String versionName = BuildConfig.VERSION_NAME;
         String appName = getString(R.string.app_name);
 
+        // Static "About" text shown to the user.
         String about =
                 appName + "\n" +
                         "Version: " + "1.0" + "\n\n" +
@@ -39,9 +55,9 @@ public class AboutActivity extends AppCompatActivity {
                         "• adjust card display to fit your style.\n\n" +
                         "Thank you for using the app!";
 
-
         aboutText.setText(about);
 
+        // Apply system bar insets as padding so content is not overlapped by status/navigation bars.
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

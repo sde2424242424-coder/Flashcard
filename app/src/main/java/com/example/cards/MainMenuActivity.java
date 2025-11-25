@@ -1,3 +1,4 @@
+
 package com.example.cards;
 
 import android.annotation.SuppressLint;
@@ -28,6 +29,20 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * MainMenuActivity
+ *
+ * Central hub screen of the application. Displays a list of available decks,
+ * provides navigation through a DrawerLayout, and allows access to Settings,
+ * About screen, and Exit dialog.
+ *
+ * Responsibilities:
+ * - Initialize UI components (Toolbar, Drawer, RecyclerView).
+ * - Load predefined deck list.
+ * - Handle navigation menu selections.
+ * - Open DeckActivity when a deck is selected.
+ * - Apply theme from saved preferences.
+ */
 public class MainMenuActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
@@ -41,24 +56,27 @@ public class MainMenuActivity extends AppCompatActivity {
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        // apply theme from preferences (light/dark)
+        // Apply the selected theme (light/dark) stored in preferences.
         ThemeHelper.applyThemeFromPrefs(this);
         super.onCreate(savedInstanceState);
-        // layout with DrawerLayout and RecyclerView @id/decksList
         setContentView(R.layout.activity_main_menu);
 
-        // ==== Drawer / Toolbar ====
+        // ==== Drawer / Toolbar initialization ====
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         toolbar = findViewById(R.id.toolbar);
+
+        // Exit button: opens a confirmation dialog before closing the app.
         ImageButton btnExit = findViewById(R.id.btn_exit);
         btnExit.setOnClickListener(v -> showExitDialog());
 
+        // Setup toolbar and attach drawer-opening behavior.
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             toolbar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
         }
 
+        // Navigation menu: handles Settings, About, and Home.
         if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(item -> {
                 int id = item.getItemId();
@@ -75,52 +93,55 @@ public class MainMenuActivity extends AppCompatActivity {
             });
         }
 
-        // ==== RecyclerView with decks list ====
+        // ==== RecyclerView with deck list ====
         rvDecks = findViewById(R.id.decksList);
         rvDecks.setLayoutManager(new LinearLayoutManager(this));
 
-        // if you need a divider between items, uncomment:
+        // Optional divider between items:
         // rvDecks.addItemDecoration(new DividerItemDecoration(this, RecyclerView.VERTICAL));
         rvDecks.setClipToPadding(false);
+
+        // Custom item decoration for overlapping card effect.
         rvDecks.addItemDecoration(new OverlapDecoration(this, 0, 0));
 
-        // deck data (replace with your data source if needed)
+        // Predefined deck names (can be replaced with dynamic data source).
         String[] deckNames = {
-                "Words Level 1, Part 1", // 1
-                "Words Level 1, Part 2", // 2
-                "Words Level 2, Part 1", // 3
-                "Words Level 2, Part 2", // 4
-                "Words Level 2, Part 3", // 5
-                "Words Level 3, Part 1", // 6
-                "Words Level 3, Part 2", // 7
-                "Words Level 3, Part 3", // 8
-                "Words Level 3, Part 4", // 9
-                "Words Level 3, Part 5", // 10
-                "Words Level 4, Part 1", // 11
-                "Words Level 4, Part 2", // 12
-                "Words Level 4, Part 3", // 13
-                "Words Level 4, Part 4", // 14
-                "Words Level 4, Part 5", // 15
-                "Words Level 4, Part 6", // 16
-                "Words Level 5, Part 1", // 17
-                "Words Level 5, Part 2", // 18
-                "Words Level 5, Part 3", // 19
-                "Words Level 5, Part 4", // 20
-                "Words Level 5, Part 5", // 21
-                "Words Level 5, Part 6", // 22
-                "Words Level 6, Part 1", // 23
-                "Words Level 6, Part 2", // 24
-                "Words Level 6, Part 3", // 25
-                "Words Level 6, Part 4", // 26
-                "Words Level 6, Part 5"  // 27
+                "Words Level 1, Part 1",
+                "Words Level 1, Part 2",
+                "Words Level 2, Part 1",
+                "Words Level 2, Part 2",
+                "Words Level 2, Part 3",
+                "Words Level 3, Part 1",
+                "Words Level 3, Part 2",
+                "Words Level 3, Part 3",
+                "Words Level 3, Part 4",
+                "Words Level 3, Part 5",
+                "Words Level 4, Part 1",
+                "Words Level 4, Part 2",
+                "Words Level 4, Part 3",
+                "Words Level 4, Part 4",
+                "Words Level 4, Part 5",
+                "Words Level 4, Part 6",
+                "Words Level 5, Part 1",
+                "Words Level 5, Part 2",
+                "Words Level 5, Part 3",
+                "Words Level 5, Part 4",
+                "Words Level 5, Part 5",
+                "Words Level 5, Part 6",
+                "Words Level 6, Part 1",
+                "Words Level 6, Part 2",
+                "Words Level 6, Part 3",
+                "Words Level 6, Part 4",
+                "Words Level 6, Part 5"
         };
 
+        // Convert deck names into Deck objects.
         decks.clear();
         for (int i = 0; i < deckNames.length; i++) {
             decks.add(new Deck(i + 1, (i + 1) + ". " + deckNames[i]));
         }
 
-        // adapter: click opens deck screen (DeckActivity)
+        // Adapter: clicking on a deck opens the DeckActivity.
         adapter = new DeckAdapter(decks, deck -> {
             Intent i = new Intent(MainMenuActivity.this, DeckActivity.class);
             i.putExtra(DeckActivity.EXTRA_DECK_ID, deck.id);
@@ -133,12 +154,17 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // re-bind items → adapter recalculates progress for each deck
+        // Ensure deck items update progress and refresh UI.
         if (rvDecks != null && rvDecks.getAdapter() != null) {
             rvDecks.getAdapter().notifyDataSetChanged();
         }
     }
 
+    /**
+     * Displays an exit confirmation dialog.
+     * "Yes" closes the entire application using finishAffinity().
+     * "No" simply closes the dialog.
+     */
     private void showExitDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.dialog_exit, null);
@@ -162,16 +188,19 @@ public class MainMenuActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // your menu XML
+        // Inflate top-right menu (Settings icon)
         getMenuInflater().inflate(R.menu.nav_drawer_menu, menu);
         return true;
     }
 
+    /**
+     * Handles toolbar menu item clicks.
+     * Opens Settings when the settings button is pressed.
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        // menu item "settings"
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
