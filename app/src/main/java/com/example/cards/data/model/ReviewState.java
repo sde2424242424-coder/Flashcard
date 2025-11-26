@@ -3,7 +3,6 @@ package com.example.cards.data.model;
 import static androidx.room.ForeignKey.CASCADE;
 
 import androidx.annotation.Nullable;
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -33,7 +32,7 @@ import androidx.room.PrimaryKey;
                 onDelete = CASCADE
         ),
         indices = {
-                @Index(value = "cardId") // non-unique index for fast lookup by cardId
+                @Index(value = "cardId") // non-unique index for fast lookup
         }
 )
 public class ReviewState {
@@ -42,7 +41,6 @@ public class ReviewState {
     public long id;
 
     /** Foreign key referencing Card(id). */
-    @ColumnInfo(index = true)
     public long cardId;
 
     /** Current interval length in days (0 = learning). */

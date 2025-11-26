@@ -8,7 +8,8 @@
     android:paddingBottom="5dp"
     android:paddingHorizontal="12dp"
     android:clipChildren="false"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:elevation="1dp">
 
     <!-- Карточка -->
     <LinearLayout

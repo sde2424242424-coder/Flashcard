@@ -71,7 +71,7 @@ public class DeckAdapter extends RecyclerView.Adapter<DeckAdapter.VH> {
         VH(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.tvTitle);
-            fox = itemView.findViewById(R.id.imgFoxHead);
+            //fox = itemView.findViewById(R.id.imgFoxHead);
             tvPercent = itemView.findViewById(R.id.tvPercent);
             progress  = itemView.findViewById(R.id.progress);
         }
