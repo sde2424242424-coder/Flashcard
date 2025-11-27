@@ -60,13 +60,14 @@ public interface ReviewDao {
      * @return list of due {@link Card} items for the given deck
      */
     @Query("""
-           SELECT c.* FROM cards c
-           JOIN review_state rs ON rs.cardId = c.id
-           WHERE c.deckId = :deckId AND rs.dueAt <= :now AND c.excluded = 0
-           ORDER BY rs.dueAt ASC
-           LIMIT :limit
-           """)
+       SELECT c.* FROM cards c
+       JOIN review_state rs ON rs.cardId = c.id
+       WHERE c.deckId = :deckId AND rs.dueAt <= :now AND c.excluded = 0
+       ORDER BY RANDOM()              -- ← вместо ORDER BY rs.dueAt ASC
+       LIMIT :limit
+       """)
     List<Card> getDueCards(long deckId, long now, int limit);
+
 
     // ---------- COUNTS ----------
 

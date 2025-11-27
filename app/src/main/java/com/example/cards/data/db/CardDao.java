@@ -252,9 +252,11 @@ public interface CardDao {
                     "FROM cards c " +
                     "LEFT JOIN review_state rs ON rs.cardId = c.id " +
                     "LEFT JOIN learned_state ls ON ls.cardId = c.id " +
+                    "WHERE COALESCE(c.excluded, 0) = 0 " +   // ← добавил фильтр
                     "ORDER BY rs.dueAt ASC, c.id ASC"
     )
     List<WordWithStats> getWordsWithStatsAll();
+
 
     /**
      * Returns unlearned, non-excluded words for a deck with stats.
