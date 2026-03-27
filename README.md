@@ -30,14 +30,22 @@ Key principles:
 
 ## Screenshots
 
-![MainMenuActivity](screenshots/MainMenuActivity.jpg)  
-![DeckActivity](screenshots/DeckActivity.jpg)  
-![WordListActivity](screenshots/WordListActivity.jpg)
-![StudyActivity1](screenshots/StudyActivity1.jpg)
-![StudyActivity2](screenshots/StudyActivity2.jpg)
-![SettingsActivity](screenshots/SettingsActivity.jpg)
-![SettingsActivityLose](screenshots/SettingsActivityLose.jpg)
-![MainMenuActivityDarkmode](screenshots/MainMenuActivityDarkmode.jpg)
+<p align="center">
+  <img src="screenshots/MainMenuActivity.jpg" width="200"/>
+  <img src="screenshots/DeckActivity.jpg" width="200"/>
+  <img src="screenshots/WordListActivity.jpg" width="200"/>
+</p>
+
+<p align="center">
+  <img src="screenshots/StudyActivity1.jpg" width="200"/>
+  <img src="screenshots/StudyActivity2.jpg" width="200"/>
+  <img src="screenshots/SettingsActivity.jpg" width="200"/>
+</p>
+
+<p align="center">
+  <img src="screenshots/SettingsActivityLose.jpg" width="200"/>
+  <img src="screenshots/MainMenuActivityDarkmode.jpg" width="200"/>
+</p>
 ---
 
 ## Features
